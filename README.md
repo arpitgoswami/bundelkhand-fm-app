@@ -28,6 +28,3 @@ We welcome contributions! Please read our contribution guidelines before submitt
 ## Acknowledgments
 - Community support for open‑source collaboration  
 - Inspiration drawn from regional media initiatives  
-
----  
-*For more information, visit the repository on GitHub.*
