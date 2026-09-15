@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Bundelkhand FM — On the Road</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Khand:wght@500;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body class="min-h-screen font-['Inter']">
+    <!-- background photo -->
+    <div
+      id="bg"
+      class="fixed inset-0 -z-20 bg-cover bg-center transition-[background-image] duration-500"
+    ></div>
+    <!-- readability overlay, swapped between day / night -->
+    <div id="overlay" class="fixed inset-0 -z-10"></div>
+
+    <div id="app" class="relative min-h-screen">
+      <!-- header -->
+      <header class="flex items-center justify-between px-5 pt-6 sm:px-8">
+        <div>
+          <div id="brand" class="font-['Khand'] text-lg font-semibold">
+            Bundelkhand FM
+          </div>
+          <div id="passenger" class="mt-0.5 text-[11px] opacity-50"></div>
+        </div>
+
+        <button
+          id="modeBtn"
+          onclick="toggleMode()"
+          class="flex h-9 w-9 items-center justify-center rounded-full backdrop-blur-xl"
+        >
+          <svg
+            id="modeIcon"
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+            />
+            <circle
+              cx="12"
+              cy="12"
+              r="4.2"
+              stroke="currentColor"
+              stroke-width="1.6"
+            />
+          </svg>
+        </button>
+      </header>
+
+      <!-- player -->
+      <main
+        class="flex min-h-[calc(100vh-84px)] items-center justify-center px-4 py-10"
+      >
+        <section
+          id="panel"
+          class="w-full max-w-lg rounded-2xl p-6 shadow-2xl backdrop-blur-xl sm:p-7"
+        >
+          <div class="flex items-center gap-4">
+            <div
+              id="badge"
+              class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-[#f2b400]/50"
+            >
+              <span class="font-['JetBrains_Mono'] text-[10px] text-[#f2b400]"
+                >FM</span
+              >
+            </div>
+            <div class="min-w-0 flex-1">
+              <div
+                id="title"
+                class="truncate font-['Khand'] text-xl font-semibold"
+              >
+                —
+              </div>
+              <div
+                id="artist"
+                class="truncate text-[11px] uppercase tracking-[.14em] opacity-50"
+              >
+                —
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-5 flex items-center gap-3">
+            <span
+              id="time"
+              class="font-['JetBrains_Mono'] text-[10px] opacity-50"
+              >0:00</span
+            >
+            <input
+              id="progress"
+              type="range"
+              min="0"
+              max="100"
+              value="0"
+              class="h-1 w-full accent-[#f2b400]"
+            />
+            <span
+              id="duration"
+              class="font-['JetBrains_Mono'] text-[10px] opacity-50"
+              >0:00</span
+            >
+          </div>
+
+          <div class="mt-6 flex items-center justify-center gap-8">
+            <button
+              onclick="prevTrack()"
+              aria-label="Previous"
+              class="opacity-60 hover:opacity-100"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M6 5h2v14H6zM20 5v14l-11-7z" />
+              </svg>
+            </button>
+
+            <button
+              id="playBtn"
+              onclick="togglePlay()"
+              aria-label="Play"
+              class="flex h-14 w-14 items-center justify-center rounded-full bg-[#f2b400] text-[#1d2116] transition hover:scale-105"
+            >
+              <svg
+                id="playIcon"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M8 5l12 7-12 7z" />
+              </svg>
+            </button>
+
+            <button
+              onclick="nextTrack()"
+              aria-label="Next"
+              class="opacity-60 hover:opacity-100"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M16 5h2v14h-2zM4 5v14l11-7z" />
+              </svg>
+            </button>
+          </div>
+
+          <div
+            id="divider"
+            class="mt-6 flex flex-wrap items-center justify-between gap-3 border-t pt-4 text-[11px]"
+          >
+            <div class="opacity-50">
+              Route
+              <span id="route" class="ml-1 opacity-100">Jhansi → Mahoba</span>
+            </div>
+            <div class="opacity-50">
+              Bus <span id="bus" class="ml-1 opacity-100">BKD-07</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <button
+                onclick="openBox('routes')"
+                class="opacity-50 hover:opacity-90"
+              >
+                Routes
+              </button>
+              <button onclick="honk()" class="text-[#f2b400] hover:opacity-90">
+                Horn
+              </button>
+            </div>
+          </div>
+
+          <button
+            onclick="location.href = 'index.html'"
+            class="mt-4 w-full text-center text-[10px] opacity-35 hover:opacity-70"
+          >
+            Change passenger
+          </button>
+        </section>
+      </main>
+
+      <!-- routes modal -->
+      <div
+        id="routes"
+        class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 p-5 backdrop-blur-sm"
+      >
+        <div
+          class="w-full max-w-sm rounded-2xl bg-[#14171d] p-5 text-[#eef1e2]"
+        >
+          <div class="flex items-center justify-between">
+            <h2 class="font-['Khand'] text-xl font-semibold">Choose a route</h2>
+            <button
+              onclick="closeBox('routes')"
+              class="opacity-50 hover:opacity-90"
+            >
+              ✕
+            </button>
+          </div>
+          <div id="routeList" class="mt-4 space-y-2"></div>
+        </div>
+      </div>
+
+      <div
+        id="toast"
+        class="fixed bottom-8 left-1/2 z-[60] hidden -translate-x-1/2 rounded-full bg-[#1d2116] px-4 py-2 text-[11px] text-[#eef1e2]"
+      ></div>
+    </div>
+
+    <script>
+      // ---------- content you can edit ----------
+
+      // Put your audio files in a folder named "music" next to this page,
+      // named track-1.mp3, track-2.mp3, track-3.mp3, track-4.mp3
+      // (or change the "file" paths below to match your own filenames).
+      const TRACKS = [
+        {
+          title: "Bheda Teriyaan O",
+          artist: "Bundeli Radio",
+          file: "music/track-1.mp3",
+        },
+        {
+          title: "Kesariya Balam",
+          artist: "Folk Journey",
+          file: "music/track-2.mp3",
+        },
+        {
+          title: "Nadiya Kinare",
+          artist: "Bundelkhand FM",
+          file: "music/track-3.mp3",
+        },
+        { title: "Sajni Re", artist: "Desi Safar", file: "music/track-4.mp3" },
+      ];
+
+      const ROUTES = [
+        ["Jhansi → Mahoba", "BKD-07"],
+        ["Jhansi → Banda", "BKD-12"],
+        ["Banda → Chitrakoot", "CHK-04"],
+        ["Mahoba → Khajuraho", "BKD-21"],
+      ];
+
+      const BG = {
+        day: "./images/day.jpg",
+        night: "./images/night.jpg",
+      };
+
+      // ---------- state ----------
+
+      const audio = new Audio();
+      let index = 0;
+      let mode = "night";
+
+      const passenger = JSON.parse(
+        localStorage.getItem("bundelkhandPassenger") || "null",
+      );
+      if (!passenger) location.href = "index.html";
+      else
+        document.getElementById("passenger").textContent =
+          passenger.name + " · Passenger";
+
+      // ---------- theme ----------
+
+      const PANEL = {
+        night: "bg-white/10 border border-white/15 text-[#eef1e2]",
+        day: "bg-white/70 border border-black/10 text-[#1d2116]",
+      };
+      const OVERLAY = {
+        night: "bg-gradient-to-b from-black/75 via-black/35 to-black/85",
+        day: "bg-gradient-to-b from-white/5 via-black/0 to-black/35",
+      };
+      const HEADER_BTN = {
+        night: "bg-white/10 text-[#eef1e2]",
+        day: "bg-black/10 text-[#1d2116]",
+      };
+      const DIVIDER = {
+        night: "border-white/10",
+        day: "border-black/10",
+      };
+
+      function applyMode() {
+        document.getElementById("bg").style.backgroundImage =
+          `url("${BG[mode]}")`;
+        document.getElementById("overlay").className =
+          "fixed inset-0 -z-10 " + OVERLAY[mode];
+        document.getElementById("panel").className =
+          "w-full max-w-lg rounded-2xl p-6 shadow-2xl backdrop-blur-xl sm:p-7 " +
+          PANEL[mode];
+        document.getElementById("modeBtn").className =
+          "flex h-9 w-9 items-center justify-center rounded-full backdrop-blur-xl " +
+          HEADER_BTN[mode];
+        document.getElementById("divider").className =
+          "mt-6 flex flex-wrap items-center justify-between gap-3 border-t pt-4 text-[11px] " +
+          DIVIDER[mode];
+        document.getElementById("modeIcon").innerHTML =
+          mode === "day"
+            ? '<circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.6"/><path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>'
+            : '<path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>';
+      }
+
+      function toggleMode() {
+        mode = mode === "night" ? "day" : "night";
+        applyMode();
+      }
+
+      // ---------- player ----------
+
+      function fmt(s) {
+        if (!isFinite(s) || s < 0) s = 0;
+        const m = Math.floor(s / 60);
+        const r = Math.floor(s % 60);
+        return m + ":" + String(r).padStart(2, "0");
+      }
+
+      function loadTrack(i, autoplay) {
+        index = (i + TRACKS.length) % TRACKS.length;
+        const t = TRACKS[index];
+        document.getElementById("title").textContent = t.title;
+        document.getElementById("artist").textContent = t.artist;
+        document.getElementById("duration").textContent = "0:00";
+        document.getElementById("time").textContent = "0:00";
+        document.getElementById("progress").value = 0;
+        audio.src = t.file;
+        if (autoplay) audio.play().catch(() => {});
+        setPlayIcon(!audio.paused);
+      }
+
+      function setPlayIcon(playing) {
+        document.getElementById("playIcon").innerHTML = playing
+          ? '<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>'
+          : '<path d="M8 5l12 7-12 7z"/>';
+      }
+
+      function togglePlay() {
+        if (audio.paused) audio.play().catch(() => {});
+        else audio.pause();
+      }
+      function nextTrack() {
+        loadTrack(index + 1, !audio.paused);
+      }
+      function prevTrack() {
+        loadTrack(index - 1, !audio.paused);
+      }
+
+      audio.addEventListener("play", () => setPlayIcon(true));
+      audio.addEventListener("pause", () => setPlayIcon(false));
+      audio.addEventListener("ended", () => nextTrack());
+      audio.addEventListener("loadedmetadata", () => {
+        document.getElementById("duration").textContent = fmt(audio.duration);
+      });
+      audio.addEventListener("timeupdate", () => {
+        if (audio.duration) {
+          document.getElementById("progress").value =
+            (audio.currentTime / audio.duration) * 100;
+        }
+        document.getElementById("time").textContent = fmt(audio.currentTime);
+      });
+      document.getElementById("progress").addEventListener("input", (e) => {
+        if (audio.duration)
+          audio.currentTime = (e.target.value / 100) * audio.duration;
+      });
+
+      // ---------- routes / horn ----------
+
+      function openBox(id) {
+        document.getElementById(id).classList.remove("hidden");
+        document.getElementById(id).classList.add("flex");
+      }
+      function closeBox(id) {
+        document.getElementById(id).classList.add("hidden");
+        document.getElementById(id).classList.remove("flex");
+      }
+      function renderRoutes() {
+        document.getElementById("routeList").innerHTML = ROUTES.map(
+          (r, i) => `
+          <button onclick="chooseRoute(${i})" class="w-full rounded-xl border border-white/10 p-3 text-left hover:bg-white/5">
+            <div class="font-['Khand'] text-base font-semibold">${r[0]}</div>
+            <div class="font-['JetBrains_Mono'] mt-1 text-[10px] opacity-50">${r[1]}</div>
+          </button>`,
+        ).join("");
+      }
+      function chooseRoute(i) {
+        document.getElementById("route").textContent = ROUTES[i][0];
+        document.getElementById("bus").textContent = ROUTES[i][1];
+        closeBox("routes");
+        toast("Route changed");
+      }
+      function honk() {
+        toast(
+          ["Honk!", "Coming through!", "Beep beep!"][
+            Math.floor(Math.random() * 3)
+          ],
+        );
+      }
+      function toast(message) {
+        const el = document.getElementById("toast");
+        el.textContent = message;
+        el.classList.remove("hidden");
+        clearTimeout(window.tt);
+        window.tt = setTimeout(() => el.classList.add("hidden"), 1500);
+      }
+      document.getElementById("routes").addEventListener("click", (e) => {
+        if (e.target.id === "routes") closeBox("routes");
+      });
+
+      // ---------- boot ----------
+
+      renderRoutes();
+      applyMode();
+      loadTrack(0, false);
+    </script>
+  </body>
+</html>
