@@ -6,6 +6,7 @@
     <title>Bundelkhand FM Application</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
+
     <link rel="icon" href="./favicon.ico" />
 
     <script>
@@ -55,104 +56,7 @@
       crossorigin="anonymous"
     ></script>
 
-    <style>
-      *{box-sizing:border-box}
-      html,body{margin:0;width:100%;height:100%;overflow:hidden}
-      #backgroundVideo{transition:opacity:.7s ease}
-      #scene::after{
-        content:"";
-        position:absolute;
-        inset:0;
-        pointer-events:none;
-        z-index:1;
-        background:linear-gradient(
-          180deg,
-          rgba(7,8,10,.28) 0%,
-          rgba(7,8,10,.08) 38%,
-          rgba(7,8,10,.42) 100%
-        )
-      }
-      .player{
-        background:rgba(5,6,7,.85);
-        border:1px solid rgba(255,255,255,.08);
-        box-shadow:0 24px 70px rgba(0,0,0,.58),0 8px 24px rgba(0,0,0,.28);
-        backdrop-filter:blur(24px);
-        -webkit-backdrop-filter:blur(24px)
-      }
-      .progress-area{
-        position:relative;
-        height:12px;
-        display:flex;
-        align-items:center;
-        width:100%;
-        cursor:pointer
-      }
-      .progress-track{
-        position:relative;
-        height:3px;
-        width:100%;
-        overflow:hidden;
-        border-radius:999px;
-        background:rgba(255,255,255,.15);
-        transition:height .2s ease
-      }
-      .progress-area:hover .progress-track,
-      .progress-area:active .progress-track{height:5px}
-      .progress-fill{
-        height:100%;
-        width:0;
-        border-radius:999px;
-        background:#f2b400
-      }
-      .modal-card{
-        background:rgba(8,9,10,.97);
-        border:1px solid rgba(255,255,255,.12);
-        box-shadow:0 30px 100px rgba(0,0,0,.65);
-        transform:translateY(15px) scale(.98);
-        transition:transform .3s cubic-bezier(.175,.885,.32,1.275)
-      }
-      .modal-backdrop{
-        background:rgba(0,0,0,.7);
-        backdrop-filter:blur(12px);
-        -webkit-backdrop-filter:blur(12px);
-        opacity:0;
-        visibility:hidden;
-        transition:opacity .3s ease,visibility .3s ease
-      }
-      .modal-backdrop.is-open{
-        opacity:1;
-        visibility:visible
-      }
-      .modal-backdrop.is-open .modal-card{
-        transform:translateY(0) scale(1)
-      }
-      .track-item{transition:background .2s ease,border-color .2s ease}
-      .track-item:hover,.track-item:focus{
-        background:rgba(255,255,255,.055);
-        outline:none
-      }
-      .track-item.active{
-        background:rgba(242,180,0,.1);
-        border-color:rgba(242,180,0,.3)
-      }
-      .rain-drop{
-        position:absolute;
-        top:-40px;
-        width:1px;
-        background:rgba(220,235,255,.18);
-        transform:rotate(12deg);
-        pointer-events:none
-      }
-      ::-webkit-scrollbar{width:6px}
-      ::-webkit-scrollbar-track{background:transparent}
-      ::-webkit-scrollbar-thumb{
-        background:rgba(255,255,255,.15);
-        border-radius:10px
-      }
-      ::-webkit-scrollbar-thumb:hover{
-        background:rgba(255,255,255,.25)
-      }
-    </style>
+    <link rel="stylesheet" href="style.css" />
   </head>
 
   <body
@@ -190,22 +94,58 @@
           </div>
         </div>
 
-        <div class="flex items-center gap-3 sm:gap-4">
-          <button
-            id="rainBtn"
-            class="rounded border border-white/20 bg-black/45 px-3 py-2 font-mono text-[8px] tracking-[.12em] text-paper/80 backdrop-blur-md transition hover:border-white/40 hover:bg-black/60 sm:px-4 sm:py-2.5 sm:text-[9px]"
-          >
-            <i class="fa-solid fa-cloud-rain mr-1"></i>
-            Rain
-          </button>
+        <div class="flex flex-col items-end gap-3 sm:gap-4">
+          <div class="flex items-center gap-3 sm:gap-4">
+            <button
+              id="rainBtn"
+              class="rounded border border-white/20 bg-black/45 px-3 py-2 font-mono text-[8px] tracking-[.12em] text-paper/80 backdrop-blur-md transition hover:border-white/40 hover:bg-black/60 sm:px-4 sm:py-2.5 sm:text-[9px]"
+            >
+              <i class="fa-solid fa-cloud-rain mr-1"></i>
+              Rain
+            </button>
 
-          <button
-            id="modeBtn"
-            class="rounded border border-white/20 bg-black/45 px-3 py-2 font-mono text-[8px] tracking-[.12em] text-paper/80 backdrop-blur-md transition hover:border-white/40 hover:bg-black/60 sm:px-4 sm:py-2.5 sm:text-[9px]"
-          >
-            <i class="fa-solid fa-sun mr-1"></i>
-            Day
-          </button>
+            <button
+              id="modeBtn"
+              class="rounded border border-white/20 bg-black/45 px-3 py-2 font-mono text-[8px] tracking-[.12em] text-paper/80 backdrop-blur-md transition hover:border-white/40 hover:bg-black/60 sm:px-4 sm:py-2.5 sm:text-[9px]"
+            >
+              <i class="fa-solid fa-sun mr-1"></i>
+              Day
+            </button>
+          </div>
+
+          <div class="flex items-center gap-5 pr-1">
+            <div class="text-right">
+              <div
+                id="realClock"
+                class="font-mono text-[13px] font-medium leading-none text-white/90 sm:text-[15px]"
+              >
+                00:00:00
+              </div>
+
+              <div
+                class="mt-1 font-mono text-[7px] tracking-[.18em] text-white/35"
+              >
+                LOCAL TIME
+              </div>
+            </div>
+
+            <div class="h-7 w-px bg-white/10"></div>
+
+            <div class="text-right">
+              <div
+                id="distance"
+                class="font-mono text-[13px] font-medium leading-none text-white/90 sm:text-[15px]"
+              >
+                0 KM
+              </div>
+
+              <div
+                class="mt-1 font-mono text-[7px] tracking-[.18em] text-white/35"
+              >
+                DISTANCE
+              </div>
+            </div>
+          </div>
         </div>
       </header>
 
@@ -419,359 +359,6 @@
       </div>
     </main>
 
-    <script>
-      const TRACKS = [
-        {
-          title: "Aaye Ho Meri Zindagi Mein",
-          artist: "Alka Yagnik · Raja Hindustani",
-          file: "music/Aaye Ho Meri Zindagi Mein ALKA YAGNIK Raja Hindustani 1996.mp3",
-        },
-        {
-          title: "Pehla Nasha Pehla Khumar",
-          artist: "Udit Narayan · Sadhana Sargam",
-          file: "music/Pehla Nasha Pehla khumar Full HD I Udit Narayan,Sadhana sargam I Jo Jeeta wohi sikandar.mp3",
-        },
-      ];
-
-      const BG = {
-        day: "./background/day.mp4",
-        night: "./background/night.mp4",
-      };
-
-      const $ = (id) => document.getElementById(id);
-
-      const DOM = {
-        video: $("backgroundVideo"),
-        playBtns: [$("playBtn"), $("playBtnMob")],
-        prevBtns: [$("prevBtn"), $("prevBtnMob")],
-        nextBtns: [$("nextBtn"), $("nextBtnMob")],
-        chooseBtns: [$("chooseBtn"), $("chooseBtnMob")],
-        rainBtn: $("rainBtn"),
-        modeBtn: $("modeBtn"),
-        title: $("trackTitle"),
-        artist: $("trackArtist"),
-        current: $("currentTime"),
-        duration: $("duration"),
-        progress: $("progressArea"),
-        fill: $("progressFill"),
-        modal: $("trackModal"),
-        close: $("closeModal"),
-        search: $("searchInput"),
-        list: $("trackList"),
-        rain: $("rain"),
-      };
-
-      const audio = new Audio();
-      audio.preload = "metadata";
-
-      let currentIndex = 0;
-      let mode = "night";
-      let rainEnabled = false;
-      let dragging = false;
-
-      const formatTime = (seconds) => {
-        if (!Number.isFinite(seconds)) return "0:00";
-        return `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, "0")}`;
-      };
-
-      function updatePlayIcon() {
-        DOM.playBtns.forEach((btn) => {
-          if (!btn) return;
-          btn.innerHTML = audio.paused
-            ? '<i class="fa-solid fa-circle-play text-[2.4rem] text-signal"></i>'
-            : '<i class="fa-solid fa-circle-pause text-[2.4rem] text-signal"></i>';
-        });
-      }
-
-      function loadTrack(index, autoplay = false) {
-        currentIndex = (index + TRACKS.length) % TRACKS.length;
-        const track = TRACKS[currentIndex];
-
-        DOM.title.textContent = track.title;
-        DOM.artist.textContent = track.artist;
-
-        audio.pause();
-        audio.src = encodeURI(track.file);
-        audio.load();
-
-        DOM.current.textContent = "0:00";
-        DOM.duration.textContent = "0:00";
-        DOM.fill.style.width = "0%";
-
-        renderTracks(DOM.search.value);
-        updatePlayIcon();
-
-        if (autoplay) {
-          audio
-            .play()
-            .then(updatePlayIcon)
-            .catch((error) => {
-              console.error("Audio playback failed:", error);
-              console.error("File:", track.file);
-              updatePlayIcon();
-            });
-        }
-      }
-
-      function togglePlay() {
-        if (!audio.src) {
-          loadTrack(currentIndex, true);
-          return;
-        }
-
-        if (audio.paused) {
-          audio
-            .play()
-            .then(updatePlayIcon)
-            .catch((error) => {
-              console.error("Playback failed:", error);
-              updatePlayIcon();
-            });
-        } else {
-          audio.pause();
-          updatePlayIcon();
-        }
-      }
-
-      function renderTracks(query = "") {
-        const value = query.trim().toLowerCase();
-
-        const tracks = TRACKS.map((track, index) => ({
-          ...track,
-          index,
-        })).filter((track) =>
-          `${track.title} ${track.artist}`.toLowerCase().includes(value),
-        );
-
-        if (!tracks.length) {
-          DOM.list.innerHTML = `
-      <div class="py-8 text-center font-mono text-[8px] tracking-[.1em] text-white/30">
-        NO TRACK FOUND
-      </div>
-    `;
-          return;
-        }
-
-        DOM.list.innerHTML = tracks
-          .map((track) => {
-            const active = track.index === currentIndex;
-
-            return `
-      <button
-        data-index="${track.index}"
-        class="track-item flex w-full items-center justify-between gap-4 rounded border px-3 py-3 text-left ${
-          active ? "border-signal/30 bg-signal/10" : "border-transparent"
-        }"
-      >
-        <div class="min-w-0">
-          <div class="truncate font-display text-[17px] leading-none ${
-            active ? "text-signal" : "text-white"
-          }">
-            ${track.title}
-          </div>
-          <div class="mt-1 truncate font-mono text-[8px] tracking-widest ${
-            active ? "text-signal/70" : "text-white/40"
-          }">
-            ${track.artist}
-          </div>
-        </div>
-      </button>
-    `;
-          })
-          .join("");
-      }
-
-      function openModal() {
-        renderTracks(DOM.search.value);
-        DOM.modal.classList.remove("opacity-0", "invisible");
-        DOM.modal.classList.add("opacity-100", "visible");
-        setTimeout(() => DOM.search.focus(), 100);
-      }
-
-      function closeModal() {
-        DOM.modal.classList.remove("opacity-100", "visible");
-        DOM.modal.classList.add("opacity-0", "invisible");
-        DOM.search.value = "";
-      }
-
-      function setMode(next) {
-        mode = next;
-        DOM.video.classList.add("opacity-0");
-
-        setTimeout(() => {
-          DOM.video.src = BG[mode];
-          DOM.video.load();
-          DOM.video.play().catch(() => {});
-          DOM.video.classList.remove("opacity-0");
-        }, 300);
-
-        DOM.modeBtn.innerHTML =
-          mode === "night"
-            ? '<i class="fa-solid fa-sun mr-1"></i> Day'
-            : '<i class="fa-solid fa-moon mr-1"></i> Night';
-      }
-
-      function createRain() {
-        DOM.rain.innerHTML = "";
-        const amount = innerWidth < 768 ? 80 : 150;
-        const fragment = document.createDocumentFragment();
-
-        for (let i = 0; i < amount; i++) {
-          const drop = document.createElement("span");
-          drop.className =
-            "absolute top-[-40px] pointer-events-none w-px bg-[rgba(220,235,255,.18)] rotate-[12deg] animate-rain";
-          drop.style.left = `${Math.random() * 110}%`;
-          drop.style.animationDuration = `${0.45 + Math.random() * 0.7}s`;
-          drop.style.animationDelay = `${Math.random() * 1.5}s`;
-          drop.style.opacity = `${0.12 + Math.random() * 0.25}`;
-          drop.style.height = `${18 + Math.random() * 22}px`;
-          fragment.appendChild(drop);
-        }
-
-        DOM.rain.appendChild(fragment);
-      }
-
-      function toggleRain() {
-        rainEnabled = !rainEnabled;
-
-        if (rainEnabled) {
-          createRain();
-          DOM.rain.classList.remove("hidden");
-          DOM.rainBtn.classList.add(
-            "border-signal/50",
-            "bg-signal/15",
-            "text-signal",
-          );
-        } else {
-          DOM.rain.classList.add("hidden");
-          DOM.rainBtn.classList.remove(
-            "border-signal/50",
-            "bg-signal/15",
-            "text-signal",
-          );
-        }
-      }
-
-      function updateProgress(e) {
-        if (!audio.duration) return;
-
-        const rect = DOM.progress.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const percent = Math.max(0, Math.min(1, x / rect.width));
-
-        DOM.fill.style.width = `${percent * 100}%`;
-
-        if (dragging) audio.currentTime = percent * audio.duration;
-      }
-
-      DOM.playBtns.forEach((btn) => {
-        if (btn) btn.addEventListener("click", togglePlay);
-      });
-
-      DOM.nextBtns.forEach((btn) => {
-        if (btn)
-          btn.addEventListener("click", () =>
-            loadTrack(currentIndex + 1, true),
-          );
-      });
-
-      DOM.prevBtns.forEach((btn) => {
-        if (btn)
-          btn.addEventListener("click", () =>
-            loadTrack(currentIndex - 1, true),
-          );
-      });
-
-      DOM.chooseBtns.forEach((btn) => {
-        if (btn) btn.addEventListener("click", openModal);
-      });
-
-      DOM.close.addEventListener("click", closeModal);
-      DOM.rainBtn.addEventListener("click", toggleRain);
-
-      DOM.modeBtn.addEventListener("click", () => {
-        setMode(mode === "night" ? "day" : "night");
-      });
-
-      DOM.search.addEventListener("input", () => {
-        renderTracks(DOM.search.value);
-      });
-
-      DOM.list.addEventListener("click", (e) => {
-        const button = e.target.closest("[data-index]");
-        if (!button) return;
-        loadTrack(Number(button.dataset.index), true);
-        closeModal();
-      });
-
-      DOM.modal.addEventListener("click", (e) => {
-        if (e.target === DOM.modal) closeModal();
-      });
-
-      DOM.progress.addEventListener("pointerdown", (e) => {
-        dragging = true;
-        DOM.progress.setPointerCapture(e.pointerId);
-        updateProgress(e);
-      });
-
-      DOM.progress.addEventListener("pointermove", (e) => {
-        if (dragging) updateProgress(e);
-      });
-
-      DOM.progress.addEventListener("pointerup", (e) => {
-        dragging = false;
-        updateProgress(e);
-      });
-
-      DOM.progress.addEventListener("pointercancel", () => {
-        dragging = false;
-      });
-
-      audio.addEventListener("loadedmetadata", () => {
-        DOM.duration.textContent = formatTime(audio.duration);
-      });
-
-      audio.addEventListener("timeupdate", () => {
-        if (dragging) return;
-
-        DOM.current.textContent = formatTime(audio.currentTime);
-
-        if (audio.duration) {
-          DOM.fill.style.width = `${(audio.currentTime / audio.duration) * 100}%`;
-        }
-      });
-
-      audio.addEventListener("play", updatePlayIcon);
-      audio.addEventListener("pause", updatePlayIcon);
-
-      audio.addEventListener("error", () => {
-        console.error("Could not load audio:", TRACKS[currentIndex].file);
-        updatePlayIcon();
-      });
-
-      audio.addEventListener("ended", () => {
-        loadTrack(currentIndex + 1, true);
-      });
-
-      document.addEventListener("keydown", (e) => {
-        if (e.target.tagName === "INPUT") return;
-
-        if (e.code === "Space") {
-          e.preventDefault();
-          togglePlay();
-        }
-
-        if (e.code === "Escape") closeModal();
-        if (e.code === "ArrowRight") loadTrack(currentIndex + 1, true);
-        if (e.code === "ArrowLeft") loadTrack(currentIndex - 1, true);
-      });
-
-      DOM.video.src = BG.night;
-      DOM.video.play().catch(() => {});
-
-      loadTrack(0);
-      renderTracks();
-      updatePlayIcon();
-    </script>
+    <script src="script.js"></script>
   </body>
 </html>
