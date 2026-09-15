@@ -2,322 +2,249 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Bundelkhand FM Application</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Bundelkhand FM</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
     <link
-      href="https://fonts.googleapis.com/css2?family=Khand:wght@500;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Khand:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap"
       rel="stylesheet"
     />
 
-    <style>
-      :root {
-        --paper: #eef1e2;
-        --ink: #1d2116;
-        --ink-soft: #676f56;
-        --signal: #f2b400;
-        --signal-deep: #c98f00;
-        --mist: #b9c0cf;
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      html,
-      body {
-        margin: 0;
-        min-height: 100%;
-      }
-
-      body {
-        font-family: "Inter", sans-serif;
-        color: var(--paper);
-        background: #0d0f14;
-      }
-
-      /* photo credit: Pixabay (cdn.pixabay.com), free to use */
-      .backdrop {
-        position: fixed;
-        inset: 0;
-        z-index: 0;
-        background:
-          linear-gradient(
-            180deg,
-            rgba(9, 10, 14, 0.78) 0%,
-            rgba(9, 10, 14, 0.55) 45%,
-            rgba(9, 10, 14, 0.88) 100%
-          ),
-          url("./images/index.png") center 62% / cover no-repeat;
-      }
-
-      .display {
-        font-family: "Khand", sans-serif;
-        font-weight: 600;
-      }
-
-      .mono {
-        font-family: "JetBrains Mono", ui-monospace, monospace;
-      }
-
-      main {
-        position: relative;
-        z-index: 1;
-        max-width: 1160px;
-        margin: 0 auto;
-        min-height: 100vh;
-        display: grid;
-        grid-template-columns: 1fr;
-        align-items: center;
-        gap: 44px;
-        padding: 56px 24px;
-      }
-
-      @media (min-width: 980px) {
-        main {
-          grid-template-columns: 1fr 380px;
-        }
-      }
-
-      .hero {
-        display: none;
-      }
-
-      @media (min-width: 980px) {
-        .hero {
-          display: block;
-        }
-      }
-
-      .headline {
-        font-size: clamp(48px, 6vw, 84px);
-        line-height: 0.96;
-        margin: 0 0 20px;
-        text-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
-      }
-
-      .lede {
-        max-width: 40ch;
-        font-size: 15.5px;
-        line-height: 1.75;
-        color: #d7dbcd;
-      }
-
-      .route-line {
-        margin-top: 30px;
-        font-size: 13px;
-        color: var(--mist);
-        letter-spacing: 0.02em;
-      }
-
-      .route-line b {
-        color: var(--paper);
-        font-weight: 500;
-      }
-
-      /* ---------- ticket ---------- */
-
-      .ticket-shell {
-        justify-self: center;
-        width: 100%;
-        max-width: 380px;
-        animation: stamp 0.55s cubic-bezier(0.2, 0.9, 0.3, 1.1) both;
-      }
-
-      @keyframes stamp {
-        from {
-          opacity: 0;
-          transform: scale(0.95) translateY(10px);
-        }
-        to {
-          opacity: 1;
-          transform: none;
-        }
-      }
-
-      @media (prefers-reduced-motion: reduce) {
-        .ticket-shell {
-          animation: none;
-        }
-      }
-
-      .ticket {
-        background: var(--paper);
-        color: var(--ink);
-        border-radius: 4px;
-        box-shadow:
-          0 40px 80px -24px rgba(0, 0, 0, 0.6),
-          0 2px 0 rgba(255, 255, 255, 0.5) inset;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .ticket::after {
-        /* perforated closing edge */
-        content: "";
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        height: 8px;
-        background-image: radial-gradient(
-          circle,
-          #0d0f14 3.5px,
-          transparent 4px
-        );
-        background-size: 16px 8px;
-        background-position: -8px 0;
-        opacity: 0.9;
-      }
-
-      .ticket-top {
-        padding: 32px 30px 26px;
-      }
-
-      .ticket-head {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-      }
-
-      .ticket-kicker {
-        font-size: 11.5px;
-        color: var(--ink-soft);
-      }
-
-      .ticket-title {
-        font-size: 28px;
-        margin: 5px 0 0;
-      }
-
-      .ticket-code {
-        font-size: 12px;
-        letter-spacing: 0.06em;
-        color: var(--ink-soft);
-      }
-
-      .passenger {
-        margin-top: 26px;
-        padding-top: 22px;
-        border-top: 1px solid #d4dab9;
-      }
-
-      .passenger-label {
-        font-size: 11px;
-        color: var(--ink-soft);
-      }
-
-      .passenger-name {
-        font-size: 34px;
-        margin: 5px 0 2px;
-      }
-
-      .passenger-age {
-        font-size: 13px;
-        color: var(--ink-soft);
-      }
-
-      .shuffle {
-        margin-top: 14px;
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        background: none;
-        border: none;
-        padding: 0;
-        font-family: "Inter", sans-serif;
-        font-size: 12.5px;
-        color: var(--signal-deep);
-        cursor: pointer;
-      }
-
-      .shuffle svg {
-        transition: transform 0.4s ease;
-      }
-
-      .shuffle:hover svg {
-        transform: rotate(180deg);
-      }
-
-      button.go {
-        margin-top: 28px;
-        width: 100%;
-        background: var(--ink);
-        color: var(--paper);
-        border: none;
-        border-radius: 3px;
-        padding: 15px;
-        font-family: "Khand", sans-serif;
-        font-weight: 600;
-        font-size: 18px;
-        letter-spacing: 0.01em;
-        cursor: pointer;
-        transition:
-          background 0.15s ease,
-          transform 0.15s ease;
-      }
-
-      button.go:hover {
-        background: #33392a;
-      }
-
-      button.go:active {
-        transform: scale(0.99);
-      }
-
-      button.go:focus-visible,
-      .shuffle:focus-visible {
-        outline: 2px solid var(--signal-deep);
-        outline-offset: 2px;
-      }
-    </style>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              display: ["Khand", "sans-serif"],
+              sans: ["Inter", "sans-serif"],
+              mono: ["JetBrains Mono", "monospace"],
+            },
+            colors: {
+              paper: "#eef1e2",
+              ink: "#1d2116",
+              muted: "#676f56",
+              signal: "#f2b400",
+            },
+          },
+        },
+      };
+    </script>
   </head>
 
-  <body>
-    <div class="backdrop" aria-hidden="true"></div>
+  <body class="min-h-screen bg-[#0d0f14] font-sans text-paper">
+    <div
+      class="fixed inset-0 -z-10 bg-cover bg-center"
+      style="
+        background:
+          linear-gradient(rgba(9, 10, 14, 0.65), rgba(9, 10, 14, 0.75)),
+          url(&quot;./images/index.png&quot;) center / cover no-repeat;
+      "
+    ></div>
 
-    <main>
-      <section class="hero">
-        <h1 class="headline display">Bundelkhand FM</h1>
-        <p class="lede">
-          Every ride gets a ticket, a passenger, and Bundelkhand's highway
-          songs. This one's headed from Jhansi to Banda, by way of Mahoba.
-        </p>
-        <p class="route-line"><b>Uttar Pradesh</b> — <b>Madhya Pradesh</b></p>
-      </section>
+    <main
+      class="mx-auto flex min-h-screen w-full max-w-6xl items-center px-5 py-10 sm:px-8 lg:px-10"
+    >
+      <div
+        class="grid w-full items-center gap-12 lg:grid-cols-[1fr_390px] lg:gap-20"
+      >
+        <section class="hidden lg:block">
+          <div class="mb-7 flex items-center gap-3">
+            <span class="h-px w-10 bg-[#f2b400]"></span>
 
-      <div class="ticket-shell">
-        <div class="ticket">
-          <div class="ticket-top">
-            <div class="ticket-head">
-              <div>
-                <div class="ticket-kicker">Passenger ticket</div>
-                <h2 class="ticket-title display">Bundelkhand Travels</h2>
+            <span
+              class="font-mono text-[10px] uppercase tracking-[0.22em] text-[#b9c0cf]"
+            >
+              BKD · FM
+            </span>
+          </div>
+
+          <h1
+            class="max-w-2xl font-display text-[clamp(64px,7vw,94px)] font-semibold leading-[0.86] tracking-[-0.02em] text-[#eef1e2]"
+          >
+            Bundelkhand
+            <span class="block text-[#f2b400]">FM</span>
+          </h1>
+
+          <p class="mt-8 max-w-lg text-[15px] leading-7 text-[#d7dbcd]/80">
+            Every ride has a passenger, a route, and a collection of songs made
+            for the Bundelkhand highway.
+          </p>
+
+          <div class="mt-10 flex items-center gap-4">
+            <div
+              class="rounded-full border border-white/10 bg-black/20 px-4 py-2 backdrop-blur-sm"
+            >
+              <span
+                class="font-mono text-[10px] uppercase tracking-widest text-[#b9c0cf]"
+              >
+                Uttar Pradesh
+              </span>
+            </div>
+
+            <span class="text-[#f2b400]">—</span>
+
+            <div
+              class="rounded-full border border-white/10 bg-black/20 px-4 py-2 backdrop-blur-sm"
+            >
+              <span
+                class="font-mono text-[10px] uppercase tracking-widest text-[#b9c0cf]"
+              >
+                Madhya Pradesh
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <div class="w-full">
+          <div class="mb-6 lg:hidden">
+            <div class="flex items-center gap-3">
+              <span class="h-px w-8 bg-[#f2b400]"></span>
+
+              <span
+                class="font-mono text-[10px] uppercase tracking-[0.22em] text-[#b9c0cf]"
+              >
+                BKD · FM
+              </span>
+            </div>
+
+            <h1 class="mt-3 font-display text-5xl font-semibold leading-none">
+              Bundelkhand <span class="text-[#f2b400]">FM</span>
+            </h1>
+          </div>
+
+          <div class="relative mx-auto w-full max-w-[390px]">
+            <div
+              class="absolute -inset-3 rounded-xl bg-black/30 blur-2xl"
+            ></div>
+
+            <div
+              class="relative overflow-hidden rounded-[6px] bg-[#eef1e2] text-[#1d2116] shadow-[0_35px_80px_rgba(0,0,0,0.55)]"
+            >
+              <div class="px-7 pb-8 pt-7 sm:px-8">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <p
+                      class="text-[10px] font-medium uppercase tracking-[0.16em] text-[#676f56]"
+                    >
+                      Passenger ticket
+                    </p>
+
+                    <h2
+                      class="mt-1 font-display text-[30px] font-semibold leading-none"
+                    >
+                      Bundelkhand Travels
+                    </h2>
+                  </div>
+
+                  <div
+                    class="rounded-sm border border-[#d4dab9] px-2 py-1 font-mono text-[9px] tracking-widest text-[#676f56]"
+                  >
+                    BKD·FM
+                  </div>
+                </div>
+
+                <div class="my-7 h-px bg-[#d4dab9]"></div>
+
+                <div>
+                  <p
+                    class="text-[10px] uppercase tracking-[0.16em] text-[#676f56]"
+                  >
+                    Passenger
+                  </p>
+
+                  <div
+                    id="pname"
+                    class="mt-1 font-display text-[46px] font-semibold leading-none"
+                  >
+                    —
+                  </div>
+
+                  <div id="page" class="mt-1 text-xs text-[#676f56]">—</div>
+
+                  <button
+                    onclick="rollPassenger()"
+                    type="button"
+                    class="group mt-4 inline-flex items-center gap-2 text-xs font-medium text-[#c98f00] transition hover:text-[#1d2116]"
+                  >
+                    <svg
+                      class="transition duration-500 group-hover:rotate-180"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                    >
+                      <path
+                        d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2v3h-3"
+                        stroke="currentColor"
+                        stroke-width="1.4"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+
+                    Shuffle passenger
+                  </button>
+                </div>
+
+                <div
+                  class="mt-7 grid grid-cols-2 border-y border-[#d4dab9] py-4"
+                >
+                  <div>
+                    <p
+                      class="text-[9px] uppercase tracking-[0.15em] text-[#676f56]"
+                    >
+                      Route
+                    </p>
+
+                    <p class="mt-1 font-display text-lg font-semibold">
+                      Jalaun → Sagar
+                    </p>
+                  </div>
+
+                  <div class="border-l border-[#d4dab9] pl-4">
+                    <p
+                      class="text-[9px] uppercase tracking-[0.15em] text-[#676f56]"
+                    >
+                      Via
+                    </p>
+
+                    <p class="mt-1 font-display text-lg font-semibold">
+                      Mahoba
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onclick="startJourney()"
+                  type="button"
+                  class="group mt-7 flex w-full items-center justify-between rounded-[4px] bg-[#1d2116] px-5 py-4 text-[#eef1e2] transition duration-200 hover:bg-[#303728] active:scale-[0.99]"
+                >
+                  <span class="font-display text-xl font-semibold">
+                    Start journey
+                  </span>
+
+                  <span
+                    class="flex h-8 w-8 items-center justify-center rounded-full bg-[#f2b400] text-[#1d2116] transition-transform duration-200 group-hover:translate-x-1"
+                  >
+                    <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+                      <path
+                        d="M3 8h9M9 4l4 4-4 4"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </span>
+                </button>
               </div>
-              <div class="ticket-code mono">BKD·FM</div>
             </div>
-
-            <div class="passenger">
-              <div class="passenger-label">Passenger</div>
-              <div class="passenger-name display" id="pname">—</div>
-              <div class="passenger-age" id="page">—</div>
-              <button class="shuffle" onclick="rollPassenger()" type="button">
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
-                  <path
-                    d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2v3h-3"
-                    stroke="currentColor"
-                    stroke-width="1.4"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
-                Shuffle passenger
-              </button>
-            </div>
-
-            <button class="go" onclick="startJourney()">Start journey</button>
           </div>
         </div>
       </div>
@@ -326,23 +253,36 @@
     <script>
       const NAMES = ["Arjun", "Kabir", "Ananya", "Diya"];
 
-      let passenger = { name: "", age: 0 };
+      let passenger = {
+        name: "",
+        age: 0,
+      };
 
       function rollPassenger() {
         const name = NAMES[Math.floor(Math.random() * NAMES.length)];
-        const age = 23 + Math.floor(Math.random() * 3); // 23–25
-        passenger = { name, age };
+
+        const age = 23 + Math.floor(Math.random() * 3);
+
+        passenger = {
+          name,
+          age,
+        };
+
         document.getElementById("pname").textContent = name;
+
         document.getElementById("page").textContent = age + " years old";
       }
 
       function startJourney() {
         localStorage.setItem("bundelkhandPassenger", JSON.stringify(passenger));
+
         window.location.href = "journey.html";
       }
 
       document.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") startJourney();
+        if (e.key === "Enter") {
+          startJourney();
+        }
       });
 
       rollPassenger();

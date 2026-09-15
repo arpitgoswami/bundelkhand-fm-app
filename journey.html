@@ -2,429 +2,798 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Bundelkhand FM — On the Road</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bundelkhand FM</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Khand:wght@500;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Khand:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
+
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        font-family: "Inter", sans-serif;
+        background: #0d0f14;
+        color: #eef1e2;
+      }
+
+      #scene {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      #backgroundVideo {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 0;
+        transition: opacity 0.7s ease;
+      }
+
+      #scene::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 1;
+        background: linear-gradient(
+          180deg,
+          rgba(7, 8, 10, 0.28) 0%,
+          rgba(7, 8, 10, 0.08) 38%,
+          rgba(7, 8, 10, 0.42) 100%
+        );
+      }
+
+      .player {
+        position: relative;
+        overflow: hidden;
+        background: rgba(5, 6, 7, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow:
+          0 24px 70px rgba(0, 0, 0, 0.58),
+          0 8px 24px rgba(0, 0, 0, 0.28),
+          inset 0 1px 0 rgba(255, 255, 255, 0.035);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+
+      .player::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: rgba(242, 180, 0, 0.75);
+      }
+
+      .progress-track {
+        position: relative;
+        height: 2px;
+        width: 100%;
+        overflow: hidden;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.13);
+        cursor: pointer;
+      }
+
+      .progress-fill {
+        height: 100%;
+        width: 0%;
+        border-radius: 999px;
+        background: #f2b400;
+        transition: width 0.1s linear;
+      }
+
+      .control-btn {
+        transition:
+          transform 0.2s ease,
+          opacity 0.2s ease,
+          background 0.2s ease;
+      }
+
+      .control-btn:hover {
+        opacity: 1;
+        transform: translateY(-1px);
+      }
+
+      .play-btn {
+        transition:
+          transform 0.2s ease,
+          background 0.2s ease;
+      }
+
+      .play-btn:hover {
+        transform: scale(1.04);
+      }
+
+      .modal-backdrop {
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+
+      .modal-card {
+        background: rgba(8, 9, 10, 0.97);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 30px 100px rgba(0, 0, 0, 0.65);
+      }
+
+      .track-item {
+        transition:
+          background 0.2s ease,
+          border-color 0.2s ease;
+      }
+
+      .track-item:hover {
+        background: rgba(255, 255, 255, 0.055);
+      }
+
+      .rain-drop {
+        position: absolute;
+        top: -40px;
+        width: 1px;
+        height: 30px;
+        background: rgba(220, 235, 255, 0.18);
+        transform: rotate(12deg);
+        animation: rain linear infinite;
+        pointer-events: none;
+      }
+
+      @keyframes rain {
+        from {
+          transform: translate3d(0, -60px, 0) rotate(12deg);
+        }
+
+        to {
+          transform: translate3d(-120px, 110vh, 0) rotate(12deg);
+        }
+      }
+
+      .fade-in {
+        animation: fadeIn 0.8s ease both;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 767px) {
+        #scene::after {
+          background: linear-gradient(
+            180deg,
+            rgba(7, 8, 10, 0.3) 0%,
+            rgba(7, 8, 10, 0.12) 35%,
+            rgba(7, 8, 10, 0.55) 100%
+          );
+        }
+      }
+    </style>
   </head>
 
-  <body class="min-h-screen font-['Inter']">
-    <!-- background photo -->
-    <div
-      id="bg"
-      class="fixed inset-0 -z-20 bg-cover bg-center transition-[background-image] duration-500"
-    ></div>
-    <!-- readability overlay, swapped between day / night -->
-    <div id="overlay" class="fixed inset-0 -z-10"></div>
+  <body>
+    <main id="scene">
+      <video
+        id="backgroundVideo"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="auto"
+      ></video>
 
-    <div id="app" class="relative min-h-screen">
-      <!-- header -->
-      <header class="flex items-center justify-between px-5 pt-6 sm:px-8">
-        <div>
-          <div id="brand" class="font-['Khand'] text-lg font-semibold">
-            Bundelkhand FM
-          </div>
-          <div id="passenger" class="mt-0.5 text-[11px] opacity-50"></div>
-        </div>
-
-        <button
-          id="modeBtn"
-          onclick="toggleMode()"
-          class="flex h-9 w-9 items-center justify-center rounded-full backdrop-blur-xl"
-        >
-          <svg
-            id="modeIcon"
-            width="15"
-            height="15"
-            viewBox="0 0 24 24"
-            fill="none"
-          >
-            <path
-              d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"
-              stroke="currentColor"
-              stroke-width="1.6"
-              stroke-linecap="round"
-            />
-            <circle
-              cx="12"
-              cy="12"
-              r="4.2"
-              stroke="currentColor"
-              stroke-width="1.6"
-            />
-          </svg>
-        </button>
-      </header>
-
-      <!-- player -->
-      <main
-        class="flex min-h-[calc(100vh-84px)] items-center justify-center px-4 py-10"
+      <header
+        class="absolute left-5 right-5 top-5 z-30 flex items-start justify-between sm:left-8 sm:right-8 sm:top-7 lg:left-10 lg:right-10"
       >
-        <section
-          id="panel"
-          class="w-full max-w-lg rounded-2xl p-6 shadow-2xl backdrop-blur-xl sm:p-7"
-        >
-          <div class="flex items-center gap-4">
-            <div
-              id="badge"
-              class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-[#f2b400]/50"
-            >
-              <span class="font-['JetBrains_Mono'] text-[10px] text-[#f2b400]"
-                >FM</span
-              >
-            </div>
-            <div class="min-w-0 flex-1">
-              <div
-                id="title"
-                class="truncate font-['Khand'] text-xl font-semibold"
-              >
-                —
-              </div>
-              <div
-                id="artist"
-                class="truncate text-[11px] uppercase tracking-[.14em] opacity-50"
-              >
-                —
-              </div>
-            </div>
-          </div>
+        <div class="fade-in">
+          <div class="flex items-center gap-3">
+            <span class="h-px w-8 bg-[#f2b400]"></span>
 
-          <div class="mt-5 flex items-center gap-3">
             <span
-              id="time"
-              class="font-['JetBrains_Mono'] text-[10px] opacity-50"
-              >0:00</span
+              class="font-['JetBrains_Mono'] text-[8px] tracking-[.22em] text-[#eef1e2]/60 sm:text-[9px]"
             >
-            <input
-              id="progress"
-              type="range"
-              min="0"
-              max="100"
-              value="0"
-              class="h-1 w-full accent-[#f2b400]"
-            />
-            <span
-              id="duration"
-              class="font-['JetBrains_Mono'] text-[10px] opacity-50"
-              >0:00</span
-            >
-          </div>
-
-          <div class="mt-6 flex items-center justify-center gap-8">
-            <button
-              onclick="prevTrack()"
-              aria-label="Previous"
-              class="opacity-60 hover:opacity-100"
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path d="M6 5h2v14H6zM20 5v14l-11-7z" />
-              </svg>
-            </button>
-
-            <button
-              id="playBtn"
-              onclick="togglePlay()"
-              aria-label="Play"
-              class="flex h-14 w-14 items-center justify-center rounded-full bg-[#f2b400] text-[#1d2116] transition hover:scale-105"
-            >
-              <svg
-                id="playIcon"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path d="M8 5l12 7-12 7z" />
-              </svg>
-            </button>
-
-            <button
-              onclick="nextTrack()"
-              aria-label="Next"
-              class="opacity-60 hover:opacity-100"
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path d="M16 5h2v14h-2zM4 5v14l11-7z" />
-              </svg>
-            </button>
+              BKD · FM
+            </span>
           </div>
 
           <div
-            id="divider"
-            class="mt-6 flex flex-wrap items-center justify-between gap-3 border-t pt-4 text-[11px]"
+            class="mt-1.5 font-['Khand'] text-[30px] font-semibold leading-none sm:text-[36px]"
           >
-            <div class="opacity-50">
-              Route
-              <span id="route" class="ml-1 opacity-100">Jhansi → Mahoba</span>
-            </div>
-            <div class="opacity-50">
-              Bus <span id="bus" class="ml-1 opacity-100">BKD-07</span>
-            </div>
-            <div class="flex items-center gap-3">
-              <button
-                onclick="openBox('routes')"
-                class="opacity-50 hover:opacity-90"
-              >
-                Routes
-              </button>
-              <button onclick="honk()" class="text-[#f2b400] hover:opacity-90">
-                Horn
-              </button>
-            </div>
+            Bundelkhand <span class="text-[#f2b400]">FM</span>
           </div>
+        </div>
+
+        <div class="flex items-center gap-2 sm:gap-3">
+          <button
+            id="rainBtn"
+            class="rounded-full border border-white/15 bg-black/35 px-3 py-1.5 font-['JetBrains_Mono'] text-[8px] tracking-[.12em] text-[#eef1e2]/75 backdrop-blur-md transition hover:bg-black/55 hover:text-white sm:px-4 sm:py-2 sm:text-[9px]"
+          >
+            Rain
+          </button>
 
           <button
-            onclick="location.href = 'index.html'"
-            class="mt-4 w-full text-center text-[10px] opacity-35 hover:opacity-70"
+            id="modeBtn"
+            class="rounded-full border border-white/15 bg-black/35 px-3 py-1.5 font-['JetBrains_Mono'] text-[8px] tracking-[.12em] text-[#eef1e2]/75 backdrop-blur-md transition hover:bg-black/55 hover:text-white sm:px-4 sm:py-2 sm:text-[9px]"
           >
-            Change passenger
+            Day
           </button>
-        </section>
-      </main>
-
-      <!-- routes modal -->
-      <div
-        id="routes"
-        class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 p-5 backdrop-blur-sm"
-      >
-        <div
-          class="w-full max-w-sm rounded-2xl bg-[#14171d] p-5 text-[#eef1e2]"
-        >
-          <div class="flex items-center justify-between">
-            <h2 class="font-['Khand'] text-xl font-semibold">Choose a route</h2>
-            <button
-              onclick="closeBox('routes')"
-              class="opacity-50 hover:opacity-90"
-            >
-              ✕
-            </button>
-          </div>
-          <div id="routeList" class="mt-4 space-y-2"></div>
         </div>
+      </header>
+
+      <div
+        id="playerWrap"
+        class="absolute left-1/2 top-[27vh] z-20 w-[calc(100%-40px)] max-w-[900px] -translate-x-1/2 sm:w-[calc(100%-80px)] lg:top-[29vh]"
+      >
+        <section class="player rounded-[20px] px-4 py-3 sm:px-5 sm:py-4">
+          <div
+            class="relative z-10 flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-5"
+          >
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between gap-4">
+                <div class="min-w-0">
+                  <div
+                    id="trackTitle"
+                    class="truncate font-['Khand'] text-[18px] font-medium leading-none text-[#eef1e2] sm:text-[21px]"
+                  >
+                    Select a track
+                  </div>
+
+                  <div
+                    id="trackArtist"
+                    class="mt-1 truncate font-['JetBrains_Mono'] text-[7px] tracking-[.16em] text-[#eef1e2]/45 sm:text-[8px]"
+                  >
+                    BUNDELKHAND FM
+                  </div>
+                </div>
+
+                <div class="hidden shrink-0 text-right lg:block">
+                  <div
+                    id="routeText"
+                    class="font-['Khand'] text-[14px] font-medium leading-none text-[#eef1e2]/80"
+                  >
+                    Jalaun → Sagar
+                  </div>
+
+                  <div
+                    class="mt-1 font-['JetBrains_Mono'] text-[7px] tracking-[.16em] text-[#eef1e2]/35"
+                  >
+                    VIA MAHOBA
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-3 flex items-center gap-3">
+                <span
+                  id="currentTime"
+                  class="w-7 shrink-0 font-['JetBrains_Mono'] text-[7px] text-[#eef1e2]/40"
+                >
+                  0:00
+                </span>
+
+                <div id="progressTrack" class="progress-track">
+                  <div id="progressFill" class="progress-fill"></div>
+                </div>
+
+                <span
+                  id="duration"
+                  class="w-7 shrink-0 text-right font-['JetBrains_Mono'] text-[7px] text-[#eef1e2]/40"
+                >
+                  0:00
+                </span>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between gap-3 lg:justify-end">
+              <div class="flex items-center gap-3">
+                <button
+                  id="prevBtn"
+                  class="control-btn font-['JetBrains_Mono'] text-[7px] tracking-[.12em] text-[#eef1e2]/40 hover:text-[#eef1e2]/80"
+                >
+                  PREV
+                </button>
+
+                <button
+                  id="playBtn"
+                  class="play-btn flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f2b400] text-[#11130d] shadow-lg shadow-black/30"
+                  aria-label="Play"
+                >
+                  <svg
+                    id="playIcon"
+                    width="13"
+                    height="13"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path
+                      d="M8 5.2v13.6c0 .8.9 1.3 1.6.8l10-6.8c.6-.4.6-1.3 0-1.7l-10-6.8C8.9 3.9 8 4.4 8 5.2Z"
+                    />
+                  </svg>
+                </button>
+
+                <button
+                  id="nextBtn"
+                  class="control-btn font-['JetBrains_Mono'] text-[7px] tracking-[.12em] text-[#eef1e2]/40 hover:text-[#eef1e2]/80"
+                >
+                  NEXT
+                </button>
+              </div>
+
+              <button
+                id="chooseBtn"
+                class="rounded-full border border-white/12 bg-white/[0.035] px-3 py-2 font-['JetBrains_Mono'] text-[7px] tracking-[.1em] text-[#eef1e2]/55 transition hover:bg-white/[0.07] hover:text-[#eef1e2]/90"
+              >
+                CHOOSE TRACK
+              </button>
+            </div>
+          </div>
+
+          <div class="mt-3 flex items-center justify-between lg:hidden">
+            <div
+              class="font-['Khand'] text-[13px] font-medium text-[#eef1e2]/70"
+            >
+              Jalaun → Sagar
+            </div>
+
+            <div
+              class="font-['JetBrains_Mono'] text-[6px] tracking-[.15em] text-[#eef1e2]/35"
+            >
+              VIA MAHOBA
+            </div>
+          </div>
+        </section>
       </div>
 
       <div
-        id="toast"
-        class="fixed bottom-8 left-1/2 z-[60] hidden -translate-x-1/2 rounded-full bg-[#1d2116] px-4 py-2 text-[11px] text-[#eef1e2]"
+        id="rain"
+        class="pointer-events-none absolute inset-0 z-10 hidden overflow-hidden"
       ></div>
-    </div>
+
+      <div
+        id="trackModal"
+        class="modal-backdrop fixed inset-0 z-50 hidden items-center justify-center px-5"
+      >
+        <div class="modal-card w-full max-w-[520px] rounded-[22px] p-5 sm:p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <div
+                class="font-['JetBrains_Mono'] text-[7px] tracking-[.2em] text-[#f2b400]"
+              >
+                BUNDELKHAND FM
+              </div>
+
+              <h2
+                class="mt-1 font-['Khand'] text-[27px] font-medium leading-none"
+              >
+                Choose a track
+              </h2>
+            </div>
+
+            <button
+              id="closeModal"
+              class="rounded-full border border-white/10 px-3 py-1.5 font-['JetBrains_Mono'] text-[7px] tracking-[.12em] text-[#eef1e2]/55 transition hover:bg-white/5 hover:text-white"
+            >
+              CLOSE
+            </button>
+          </div>
+
+          <div class="mt-5">
+            <div class="relative">
+              <svg
+                class="absolute left-3 top-1/2 -translate-y-1/2 text-white/30"
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="11" cy="11" r="7"></circle>
+                <path d="m20 20-4-4"></path>
+              </svg>
+
+              <input
+                id="searchInput"
+                type="text"
+                placeholder="Search track..."
+                class="w-full rounded-xl border border-white/10 bg-white/[0.035] py-3 pl-9 pr-4 font-['JetBrains_Mono'] text-[9px] text-white outline-none placeholder:text-white/25 focus:border-[#f2b400]/40"
+              />
+            </div>
+          </div>
+
+          <div
+            id="trackList"
+            class="mt-4 max-h-[300px] space-y-1 overflow-y-auto pr-1"
+          ></div>
+        </div>
+      </div>
+    </main>
 
     <script>
-      // ---------- content you can edit ----------
-
-      // Put your audio files in a folder named "music" next to this page,
-      // named track-1.mp3, track-2.mp3, track-3.mp3, track-4.mp3
-      // (or change the "file" paths below to match your own filenames).
       const TRACKS = [
         {
-          title: "Bheda Teriyaan O",
-          artist: "Bundeli Radio",
-          file: "music/track-1.mp3",
+          title: "Aaye Ho Meri Zindagi Mein",
+          artist: "Alka Yagnik · Raja Hindustani",
+          file: "music/Aaye Ho Meri Zindagi Mein ALKA YAGNIK Raja Hindustani 1996.mp3",
         },
         {
-          title: "Kesariya Balam",
-          artist: "Folk Journey",
-          file: "music/track-2.mp3",
+          title: "Pehla Nasha Pehla Khumar",
+          artist: "Udit Narayan · Sadhana Sargam",
+          file: "music/Pehla Nasha Pehla khumar Full HD I Udit Narayan,Sadhana sargam I Jo Jeeta wohi sikandar.mp3",
         },
-        {
-          title: "Nadiya Kinare",
-          artist: "Bundelkhand FM",
-          file: "music/track-3.mp3",
-        },
-        { title: "Sajni Re", artist: "Desi Safar", file: "music/track-4.mp3" },
-      ];
-
-      const ROUTES = [
-        ["Jhansi → Mahoba", "BKD-07"],
-        ["Jhansi → Banda", "BKD-12"],
-        ["Banda → Chitrakoot", "CHK-04"],
-        ["Mahoba → Khajuraho", "BKD-21"],
       ];
 
       const BG = {
-        day: "./images/day.jpg",
-        night: "./images/night.jpg",
+        day: "./background/day.mp4",
+        night: "./background/night.mp4",
       };
 
-      // ---------- state ----------
+      const scene = document.getElementById("scene");
+      const backgroundVideo = document.getElementById("backgroundVideo");
+
+      const playBtn = document.getElementById("playBtn");
+      const playIcon = document.getElementById("playIcon");
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const chooseBtn = document.getElementById("chooseBtn");
+
+      const rainBtn = document.getElementById("rainBtn");
+      const modeBtn = document.getElementById("modeBtn");
+
+      const trackTitle = document.getElementById("trackTitle");
+      const trackArtist = document.getElementById("trackArtist");
+
+      const currentTime = document.getElementById("currentTime");
+      const duration = document.getElementById("duration");
+
+      const progressTrack = document.getElementById("progressTrack");
+      const progressFill = document.getElementById("progressFill");
+
+      const trackModal = document.getElementById("trackModal");
+      const closeModal = document.getElementById("closeModal");
+
+      const searchInput = document.getElementById("searchInput");
+      const trackList = document.getElementById("trackList");
+
+      const rain = document.getElementById("rain");
+
+      let currentIndex = 0;
+      let isPlaying = false;
+      let mode = "night";
+      let rainEnabled = false;
 
       const audio = new Audio();
-      let index = 0;
-      let mode = "night";
+      audio.preload = "metadata";
 
-      const passenger = JSON.parse(
-        localStorage.getItem("bundelkhandPassenger") || "null",
-      );
-      if (!passenger) location.href = "index.html";
-      else
-        document.getElementById("passenger").textContent =
-          passenger.name + " · Passenger";
+      function formatTime(seconds) {
+        if (!Number.isFinite(seconds)) {
+          return "0:00";
+        }
 
-      // ---------- theme ----------
+        const minutes = Math.floor(seconds / 60);
 
-      const PANEL = {
-        night: "bg-white/10 border border-white/15 text-[#eef1e2]",
-        day: "bg-white/70 border border-black/10 text-[#1d2116]",
-      };
-      const OVERLAY = {
-        night: "bg-gradient-to-b from-black/75 via-black/35 to-black/85",
-        day: "bg-gradient-to-b from-white/5 via-black/0 to-black/35",
-      };
-      const HEADER_BTN = {
-        night: "bg-white/10 text-[#eef1e2]",
-        day: "bg-black/10 text-[#1d2116]",
-      };
-      const DIVIDER = {
-        night: "border-white/10",
-        day: "border-black/10",
-      };
+        const secs = Math.floor(seconds % 60)
+          .toString()
+          .padStart(2, "0");
 
-      function applyMode() {
-        document.getElementById("bg").style.backgroundImage =
-          `url("${BG[mode]}")`;
-        document.getElementById("overlay").className =
-          "fixed inset-0 -z-10 " + OVERLAY[mode];
-        document.getElementById("panel").className =
-          "w-full max-w-lg rounded-2xl p-6 shadow-2xl backdrop-blur-xl sm:p-7 " +
-          PANEL[mode];
-        document.getElementById("modeBtn").className =
-          "flex h-9 w-9 items-center justify-center rounded-full backdrop-blur-xl " +
-          HEADER_BTN[mode];
-        document.getElementById("divider").className =
-          "mt-6 flex flex-wrap items-center justify-between gap-3 border-t pt-4 text-[11px] " +
-          DIVIDER[mode];
-        document.getElementById("modeIcon").innerHTML =
-          mode === "day"
-            ? '<circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.6"/><path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>'
-            : '<path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>';
+        return `${minutes}:${secs}`;
       }
 
-      function toggleMode() {
-        mode = mode === "night" ? "day" : "night";
-        applyMode();
+      function updatePlayIcon() {
+        if (isPlaying) {
+          playIcon.innerHTML = `
+          <rect x="7" y="5" width="3.5" height="14" rx="1"></rect>
+          <rect x="13.5" y="5" width="3.5" height="14" rx="1"></rect>
+        `;
+        } else {
+          playIcon.innerHTML = `
+          <path d="M8 5.2v13.6c0 .8.9 1.3 1.6.8l10-6.8c.6-.4.6-1.3 0-1.7l-10-6.8C8.9 3.9 8 4.4 8 5.2Z"/>
+        `;
+        }
       }
 
-      // ---------- player ----------
+      function loadTrack(index, autoplay = false) {
+        currentIndex = (index + TRACKS.length) % TRACKS.length;
 
-      function fmt(s) {
-        if (!isFinite(s) || s < 0) s = 0;
-        const m = Math.floor(s / 60);
-        const r = Math.floor(s % 60);
-        return m + ":" + String(r).padStart(2, "0");
-      }
+        const track = TRACKS[currentIndex];
 
-      function loadTrack(i, autoplay) {
-        index = (i + TRACKS.length) % TRACKS.length;
-        const t = TRACKS[index];
-        document.getElementById("title").textContent = t.title;
-        document.getElementById("artist").textContent = t.artist;
-        document.getElementById("duration").textContent = "0:00";
-        document.getElementById("time").textContent = "0:00";
-        document.getElementById("progress").value = 0;
-        audio.src = t.file;
-        if (autoplay) audio.play().catch(() => {});
-        setPlayIcon(!audio.paused);
-      }
+        trackTitle.textContent = track.title;
+        trackArtist.textContent = track.artist;
 
-      function setPlayIcon(playing) {
-        document.getElementById("playIcon").innerHTML = playing
-          ? '<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>'
-          : '<path d="M8 5l12 7-12 7z"/>';
+        audio.src = track.file;
+        audio.load();
+
+        currentTime.textContent = "0:00";
+        duration.textContent = "0:00";
+        progressFill.style.width = "0%";
+
+        if (autoplay) {
+          audio
+            .play()
+            .then(() => {
+              isPlaying = true;
+              updatePlayIcon();
+            })
+            .catch(() => {
+              isPlaying = false;
+              updatePlayIcon();
+            });
+        } else {
+          isPlaying = false;
+          updatePlayIcon();
+        }
       }
 
       function togglePlay() {
-        if (audio.paused) audio.play().catch(() => {});
-        else audio.pause();
-      }
-      function nextTrack() {
-        loadTrack(index + 1, !audio.paused);
-      }
-      function prevTrack() {
-        loadTrack(index - 1, !audio.paused);
-      }
-
-      audio.addEventListener("play", () => setPlayIcon(true));
-      audio.addEventListener("pause", () => setPlayIcon(false));
-      audio.addEventListener("ended", () => nextTrack());
-      audio.addEventListener("loadedmetadata", () => {
-        document.getElementById("duration").textContent = fmt(audio.duration);
-      });
-      audio.addEventListener("timeupdate", () => {
-        if (audio.duration) {
-          document.getElementById("progress").value =
-            (audio.currentTime / audio.duration) * 100;
+        if (!audio.src) {
+          loadTrack(currentIndex, true);
+          return;
         }
-        document.getElementById("time").textContent = fmt(audio.currentTime);
-      });
-      document.getElementById("progress").addEventListener("input", (e) => {
-        if (audio.duration)
-          audio.currentTime = (e.target.value / 100) * audio.duration;
-      });
 
-      // ---------- routes / horn ----------
+        if (audio.paused) {
+          audio
+            .play()
+            .then(() => {
+              isPlaying = true;
+              updatePlayIcon();
+            })
+            .catch(() => {});
+        } else {
+          audio.pause();
+          isPlaying = false;
+          updatePlayIcon();
+        }
+      }
 
-      function openBox(id) {
-        document.getElementById(id).classList.remove("hidden");
-        document.getElementById(id).classList.add("flex");
+      function nextTrack() {
+        loadTrack(currentIndex + 1, true);
       }
-      function closeBox(id) {
-        document.getElementById(id).classList.add("hidden");
-        document.getElementById(id).classList.remove("flex");
+
+      function previousTrack() {
+        loadTrack(currentIndex - 1, true);
       }
-      function renderRoutes() {
-        document.getElementById("routeList").innerHTML = ROUTES.map(
-          (r, i) => `
-          <button onclick="chooseRoute(${i})" class="w-full rounded-xl border border-white/10 p-3 text-left hover:bg-white/5">
-            <div class="font-['Khand'] text-base font-semibold">${r[0]}</div>
-            <div class="font-['JetBrains_Mono'] mt-1 text-[10px] opacity-50">${r[1]}</div>
-          </button>`,
-        ).join("");
-      }
-      function chooseRoute(i) {
-        document.getElementById("route").textContent = ROUTES[i][0];
-        document.getElementById("bus").textContent = ROUTES[i][1];
-        closeBox("routes");
-        toast("Route changed");
-      }
-      function honk() {
-        toast(
-          ["Honk!", "Coming through!", "Beep beep!"][
-            Math.floor(Math.random() * 3)
-          ],
+
+      function renderTracks(query = "") {
+        const value = query.trim().toLowerCase();
+
+        const filtered = TRACKS.map((track, index) => ({
+          ...track,
+          index,
+        })).filter((track) =>
+          `${track.title} ${track.artist}`.toLowerCase().includes(value),
         );
+
+        if (!filtered.length) {
+          trackList.innerHTML = `
+          <div class="py-8 text-center font-['JetBrains_Mono'] text-[8px] tracking-[.1em] text-white/30">
+            NO TRACK FOUND
+          </div>
+        `;
+
+          return;
+        }
+
+        trackList.innerHTML = filtered
+          .map(
+            (track) => `
+        <button
+          data-index="${track.index}"
+          class="track-item flex w-full items-center justify-between gap-4 rounded-xl border border-transparent px-3 py-3 text-left"
+        >
+          <div class="min-w-0">
+
+            <div class="truncate font-['Khand'] text-[17px] leading-none text-[#eef1e2]/90">
+              ${track.title}
+            </div>
+
+            <div class="mt-1 truncate font-['JetBrains_Mono'] text-[6px] tracking-[.12em] text-white/30">
+              ${track.artist}
+            </div>
+
+          </div>
+
+          <span class="shrink-0 font-['JetBrains_Mono'] text-[6px] tracking-[.1em] text-[#f2b400]/70">
+            PLAY
+          </span>
+
+        </button>
+      `,
+          )
+          .join("");
+
+        trackList.querySelectorAll("[data-index]").forEach((button) => {
+          button.addEventListener("click", () => {
+            const index = Number(button.dataset.index);
+
+            loadTrack(index, true);
+            closeTrackModal();
+          });
+        });
       }
-      function toast(message) {
-        const el = document.getElementById("toast");
-        el.textContent = message;
-        el.classList.remove("hidden");
-        clearTimeout(window.tt);
-        window.tt = setTimeout(() => el.classList.add("hidden"), 1500);
+
+      function openTrackModal() {
+        renderTracks(searchInput.value);
+
+        trackModal.classList.remove("hidden");
+        trackModal.classList.add("flex");
+
+        setTimeout(() => {
+          searchInput.focus();
+        }, 50);
       }
-      document.getElementById("routes").addEventListener("click", (e) => {
-        if (e.target.id === "routes") closeBox("routes");
+
+      function closeTrackModal() {
+        trackModal.classList.add("hidden");
+        trackModal.classList.remove("flex");
+        searchInput.value = "";
+      }
+
+      function setMode(nextMode) {
+        mode = nextMode;
+
+        backgroundVideo.style.opacity = "0";
+
+        setTimeout(() => {
+          backgroundVideo.src = BG[mode];
+          backgroundVideo.load();
+
+          backgroundVideo.play().catch(() => {});
+
+          backgroundVideo.style.opacity = "1";
+        }, 300);
+
+        modeBtn.textContent = mode === "night" ? "Day" : "Night";
+      }
+
+      function createRain() {
+        rain.innerHTML = "";
+
+        const amount = window.innerWidth < 768 ? 80 : 150;
+
+        for (let i = 0; i < amount; i++) {
+          const drop = document.createElement("span");
+
+          drop.className = "rain-drop";
+          drop.style.left = `${Math.random() * 110}%`;
+          drop.style.animationDuration = `${0.45 + Math.random() * 0.7}s`;
+          drop.style.animationDelay = `${Math.random() * 1.5}s`;
+          drop.style.opacity = `${0.12 + Math.random() * 0.25}`;
+          drop.style.height = `${18 + Math.random() * 22}px`;
+
+          rain.appendChild(drop);
+        }
+      }
+
+      function toggleRain() {
+        rainEnabled = !rainEnabled;
+
+        if (rainEnabled) {
+          createRain();
+
+          rain.classList.remove("hidden");
+
+          rainBtn.textContent = "Rain On";
+        } else {
+          rain.classList.add("hidden");
+
+          rainBtn.textContent = "Rain";
+        }
+      }
+
+      playBtn.addEventListener("click", togglePlay);
+
+      nextBtn.addEventListener("click", nextTrack);
+
+      prevBtn.addEventListener("click", previousTrack);
+
+      chooseBtn.addEventListener("click", openTrackModal);
+
+      closeModal.addEventListener("click", closeTrackModal);
+
+      rainBtn.addEventListener("click", toggleRain);
+
+      modeBtn.addEventListener("click", () => {
+        setMode(mode === "night" ? "day" : "night");
       });
 
-      // ---------- boot ----------
+      searchInput.addEventListener("input", () => {
+        renderTracks(searchInput.value);
+      });
 
-      renderRoutes();
-      applyMode();
+      trackModal.addEventListener("click", (event) => {
+        if (event.target === trackModal) {
+          closeTrackModal();
+        }
+      });
+
+      progressTrack.addEventListener("click", (event) => {
+        if (!audio.duration) {
+          return;
+        }
+
+        const rect = progressTrack.getBoundingClientRect();
+
+        const percent = (event.clientX - rect.left) / rect.width;
+
+        audio.currentTime = percent * audio.duration;
+      });
+
+      audio.addEventListener("loadedmetadata", () => {
+        duration.textContent = formatTime(audio.duration);
+      });
+
+      audio.addEventListener("timeupdate", () => {
+        currentTime.textContent = formatTime(audio.currentTime);
+
+        if (audio.duration) {
+          const percent = (audio.currentTime / audio.duration) * 100;
+
+          progressFill.style.width = `${percent}%`;
+        }
+      });
+
+      audio.addEventListener("play", () => {
+        isPlaying = true;
+        updatePlayIcon();
+      });
+
+      audio.addEventListener("pause", () => {
+        isPlaying = false;
+        updatePlayIcon();
+      });
+
+      audio.addEventListener("ended", () => {
+        nextTrack();
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.code === "Space" && event.target.tagName !== "INPUT") {
+          event.preventDefault();
+          togglePlay();
+        }
+
+        if (event.code === "Escape") {
+          closeTrackModal();
+        }
+
+        if (event.code === "ArrowRight") {
+          nextTrack();
+        }
+
+        if (event.code === "ArrowLeft") {
+          previousTrack();
+        }
+      });
+
+      backgroundVideo.src = BG.night;
+      backgroundVideo.play().catch(() => {});
+
       loadTrack(0, false);
+      renderTracks();
     </script>
   </body>
 </html>
