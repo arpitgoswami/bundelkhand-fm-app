@@ -2,263 +2,163 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bundelkhand FM</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Bundelkhand FM Application</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="./favicon.ico" />
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              display: ["Khand", "sans-serif"],
+              sans: ["Inter", "sans-serif"],
+              mono: ["JetBrains Mono", "monospace"],
+            },
+            colors: {
+              paper: "#eef1e2",
+              ink: "#1d2116",
+              muted: "#676f56",
+              signal: "#f2b400",
+            },
+            keyframes: {
+              rain: {
+                from: { transform: "translate3d(0,-60px,0) rotate(12deg)" },
+                to: { transform: "translate3d(-120px,110vh,0) rotate(12deg)" },
+              },
+              fadeIn: {
+                from: { opacity: 0, transform: "translateY(8px)" },
+                to: { opacity: 1, transform: "translateY(0)" },
+              },
+            },
+            animation: {
+              rain: "rain linear infinite",
+              fadeIn: "fadeIn .8s ease both",
+            },
+          },
+        },
+      };
+    </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Khand:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
 
+    <script
+      src="https://kit.fontawesome.com/97fba59076.js"
+      crossorigin="anonymous"
+    ></script>
+
     <style>
-      * {
-        box-sizing: border-box;
-      }
-
-      html,
-      body {
-        margin: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        font-family: "Inter", sans-serif;
-        background: #0d0f14;
-        color: #eef1e2;
-      }
-
-      #scene {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-      }
-
-      #backgroundVideo {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        z-index: 0;
-        transition: opacity 0.7s ease;
-      }
-
-      #scene::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-        z-index: 1;
-        background: linear-gradient(
+      *{box-sizing:border-box}
+      html,body{margin:0;width:100%;height:100%;overflow:hidden}
+      #backgroundVideo{transition:opacity:.7s ease}
+      #scene::after{
+        content:"";
+        position:absolute;
+        inset:0;
+        pointer-events:none;
+        z-index:1;
+        background:linear-gradient(
           180deg,
-          rgba(7, 8, 10, 0.28) 0%,
-          rgba(7, 8, 10, 0.08) 38%,
-          rgba(7, 8, 10, 0.42) 100%
-        );
+          rgba(7,8,10,.28) 0%,
+          rgba(7,8,10,.08) 38%,
+          rgba(7,8,10,.42) 100%
+        )
       }
-
-      .player {
-        position: relative;
-        overflow: hidden;
-        background: rgba(5, 6, 7, 0.85);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow:
-          0 24px 70px rgba(0, 0, 0, 0.58),
-          0 8px 24px rgba(0, 0, 0, 0.28);
-        backdrop-filter: blur(24px);
-        -webkit-backdrop-filter: blur(24px);
+      .player{
+        background:rgba(5,6,7,.85);
+        border:1px solid rgba(255,255,255,.08);
+        box-shadow:0 24px 70px rgba(0,0,0,.58),0 8px 24px rgba(0,0,0,.28);
+        backdrop-filter:blur(24px);
+        -webkit-backdrop-filter:blur(24px)
       }
-
-      /* Subtle top highlight similar to the image */
-      .player::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 10%;
-        right: 10%;
-        height: 1px;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          rgba(255, 255, 255, 0.15),
-          transparent
-        );
+      .progress-area{
+        position:relative;
+        height:12px;
+        display:flex;
+        align-items:center;
+        width:100%;
+        cursor:pointer
       }
-
-      /* Improved Progress Track Area */
-      .progress-area {
-        position: relative;
-        height: 12px;
-        display: flex;
-        align-items: center;
-        width: 100%;
-        cursor: pointer;
+      .progress-track{
+        position:relative;
+        height:3px;
+        width:100%;
+        overflow:hidden;
+        border-radius:999px;
+        background:rgba(255,255,255,.15);
+        transition:height .2s ease
       }
-
-      .progress-track {
-        position: relative;
-        height: 3px;
-        width: 100%;
-        overflow: hidden;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.15);
-        transition: height 0.2s ease;
-      }
-
       .progress-area:hover .progress-track,
-      .progress-area:active .progress-track {
-        height: 5px;
+      .progress-area:active .progress-track{height:5px}
+      .progress-fill{
+        height:100%;
+        width:0;
+        border-radius:999px;
+        background:#f2b400
       }
-
-      .progress-fill {
-        height: 100%;
-        width: 0%;
-        border-radius: 999px;
-        background: #f2b400;
-        transition: width 0.1s linear;
+      .modal-card{
+        background:rgba(8,9,10,.97);
+        border:1px solid rgba(255,255,255,.12);
+        box-shadow:0 30px 100px rgba(0,0,0,.65);
+        transform:translateY(15px) scale(.98);
+        transition:transform .3s cubic-bezier(.175,.885,.32,1.275)
       }
-
-      .control-btn {
-        transition:
-          transform 0.2s ease,
-          color 0.2s ease;
+      .modal-backdrop{
+        background:rgba(0,0,0,.7);
+        backdrop-filter:blur(12px);
+        -webkit-backdrop-filter:blur(12px);
+        opacity:0;
+        visibility:hidden;
+        transition:opacity .3s ease,visibility .3s ease
       }
-
-      .control-btn:hover {
-        color: #fff;
-        transform: translateY(-1px);
+      .modal-backdrop.is-open{
+        opacity:1;
+        visibility:visible
       }
-      .control-btn:active {
-        transform: translateY(1px);
+      .modal-backdrop.is-open .modal-card{
+        transform:translateY(0) scale(1)
       }
-
-      .play-btn {
-        transition:
-          transform 0.2s ease,
-          filter 0.2s ease;
+      .track-item{transition:background .2s ease,border-color .2s ease}
+      .track-item:hover,.track-item:focus{
+        background:rgba(255,255,255,.055);
+        outline:none
       }
-
-      .play-btn:hover {
-        transform: scale(1.05);
-        filter: brightness(1.1);
+      .track-item.active{
+        background:rgba(242,180,0,.1);
+        border-color:rgba(242,180,0,.3)
       }
-      .play-btn:active {
-        transform: scale(0.95);
+      .rain-drop{
+        position:absolute;
+        top:-40px;
+        width:1px;
+        background:rgba(220,235,255,.18);
+        transform:rotate(12deg);
+        pointer-events:none
       }
-
-      .modal-backdrop {
-        background: rgba(0, 0, 0, 0.7);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        opacity: 0;
-        visibility: hidden;
-        transition:
-          opacity 0.3s ease,
-          visibility 0.3s ease;
+      ::-webkit-scrollbar{width:6px}
+      ::-webkit-scrollbar-track{background:transparent}
+      ::-webkit-scrollbar-thumb{
+        background:rgba(255,255,255,.15);
+        border-radius:10px
       }
-
-      .modal-backdrop.is-open {
-        opacity: 1;
-        visibility: visible;
-      }
-
-      .modal-card {
-        background: rgba(8, 9, 10, 0.97);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        box-shadow: 0 30px 100px rgba(0, 0, 0, 0.65);
-        transform: translateY(15px) scale(0.98);
-        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      }
-
-      .modal-backdrop.is-open .modal-card {
-        transform: translateY(0) scale(1);
-      }
-
-      .track-item {
-        transition:
-          background 0.2s ease,
-          border-color 0.2s ease;
-      }
-
-      .track-item:hover,
-      .track-item:focus {
-        background: rgba(255, 255, 255, 0.055);
-        outline: none;
-      }
-
-      .track-item.active {
-        background: rgba(242, 180, 0, 0.1);
-        border-color: rgba(242, 180, 0, 0.3);
-      }
-
-      ::-webkit-scrollbar {
-        width: 6px;
-      }
-      ::-webkit-scrollbar-track {
-        background: transparent;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.15);
-        border-radius: 10px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.25);
-      }
-
-      .rain-drop {
-        position: absolute;
-        top: -40px;
-        width: 1px;
-        height: 30px;
-        background: rgba(220, 235, 255, 0.18);
-        transform: rotate(12deg);
-        animation: rain linear infinite;
-        pointer-events: none;
-      }
-
-      @keyframes rain {
-        from {
-          transform: translate3d(0, -60px, 0) rotate(12deg);
-        }
-        to {
-          transform: translate3d(-120px, 110vh, 0) rotate(12deg);
-        }
-      }
-
-      .fade-in {
-        animation: fadeIn 0.8s ease both;
-      }
-
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(8px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      @media (max-width: 767px) {
-        #scene::after {
-          background: linear-gradient(
-            180deg,
-            rgba(7, 8, 10, 0.3) 0%,
-            rgba(7, 8, 10, 0.12) 35%,
-            rgba(7, 8, 10, 0.55) 100%
-          );
-        }
+      ::-webkit-scrollbar-thumb:hover{
+        background:rgba(255,255,255,.25)
       }
     </style>
   </head>
 
-  <body>
-    <main id="scene">
+  <body
+    class="h-screen w-full overflow-hidden bg-[#0d0f14] font-sans text-paper"
+  >
+    <main id="scene" class="relative h-full w-full overflow-hidden">
       <video
         id="backgroundVideo"
         autoplay
@@ -266,103 +166,66 @@
         loop
         playsinline
         preload="auto"
+        class="absolute inset-0 z-0 h-full w-full object-cover"
       ></video>
 
       <header
         class="absolute left-6 right-6 top-6 z-30 flex items-start justify-between sm:left-10 sm:right-10 sm:top-10"
       >
-        <!-- DO NOT CHANGE LOGO SECTION -->
-        <div class="fade-in">
+        <div class="animate-fadeIn">
           <div class="flex items-center gap-3">
-            <span class="h-px w-8 bg-[#f2b400]"></span>
+            <i class="fa-solid fa-grip-lines text-signal"></i>
+
             <span
-              class="font-['JetBrains_Mono'] text-[8px] tracking-[.22em] text-[#eef1e2]/60 sm:text-[9px]"
+              class="font-mono text-[8px] tracking-[.22em] text-paper/60 sm:text-[9px]"
             >
               BKD · FM
             </span>
           </div>
 
           <div
-            class="mt-1.5 font-['Khand'] text-[30px] font-semibold leading-none sm:text-[36px]"
+            class="mt-1.5 font-display text-[30px] font-semibold leading-none sm:text-[36px]"
           >
-            Bundelkhand <span class="text-[#f2b400]">FM</span>
+            Bundelkhand <span class="text-signal">FM</span>
           </div>
         </div>
-        <!-- END LOGO SECTION -->
 
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-3 sm:gap-4">
           <button
             id="rainBtn"
-            class="flex items-center gap-2 rounded-xl border border-white/20 bg-black/40 px-4 py-2 font-['JetBrains_Mono'] text-[10px] tracking-wide text-white backdrop-blur-md transition hover:bg-black/60 focus:outline-none"
+            class="rounded border border-white/20 bg-black/45 px-3 py-2 font-mono text-[8px] tracking-[.12em] text-paper/80 backdrop-blur-md transition hover:border-white/40 hover:bg-black/60 sm:px-4 sm:py-2.5 sm:text-[9px]"
           >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path
-                d="M20 16.2A4.5 4.5 0 0 0 17.5 8h-1.8A7 7 0 1 0 4 14.9"
-              ></path>
-              <path d="M16 14v6"></path>
-              <path d="M8 14v6"></path>
-              <path d="M12 16v6"></path>
-            </svg>
+            <i class="fa-solid fa-cloud-rain mr-1"></i>
             Rain
           </button>
 
           <button
             id="modeBtn"
-            class="flex items-center gap-2 rounded-xl border border-white/20 bg-black/40 px-4 py-2 font-['JetBrains_Mono'] text-[10px] tracking-wide text-white backdrop-blur-md transition hover:bg-black/60 focus:outline-none"
+            class="rounded border border-white/20 bg-black/45 px-3 py-2 font-mono text-[8px] tracking-[.12em] text-paper/80 backdrop-blur-md transition hover:border-white/40 hover:bg-black/60 sm:px-4 sm:py-2.5 sm:text-[9px]"
           >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle cx="12" cy="12" r="4"></circle>
-              <path d="M12 2v2"></path>
-              <path d="M12 20v2"></path>
-              <path d="m4.93 4.93 1.41 1.41"></path>
-              <path d="m17.66 17.66 1.41 1.41"></path>
-              <path d="M2 12h2"></path>
-              <path d="M20 12h2"></path>
-              <path d="m6.34 17.66-1.41 1.41"></path>
-              <path d="m19.07 4.93-1.41 1.41"></path>
-            </svg>
+            <i class="fa-solid fa-sun mr-1"></i>
             Day
           </button>
         </div>
       </header>
 
-      <!-- Player UI mapped to image_139acb.jpg -->
       <div
-        id="playerWrap"
-        class="absolute left-1/2 top-[20vh] z-20 w-[calc(80%-40px)] max-w-[1000px] -translate-x-1/2"
+        class="rounded absolute left-1/2 top-[20vh] z-20 w-[calc(100%-40px)] max-w-[1000px] -translate-x-1/2 sm:w-[calc(100%-80px)]"
       >
         <section
-          class="player rounded-[24px] px-6 py-5 sm:rounded-[32px] sm:px-10 sm:py-6 flex flex-col lg:flex-row lg:items-center gap-6 lg:gap-8"
+          class="player flex flex-col gap-6 rounded p-5 sm:p-6 lg:flex-row lg:items-center lg:gap-8"
         >
-          <!-- Left: Track Details & Progress -->
-          <div class="flex-1 min-w-0">
+          <div class="min-w-0 flex-1">
             <div
               id="trackTitle"
-              class="truncate font-['Khand'] text-[22px] font-medium leading-none text-white sm:text-[26px]"
+              class="truncate font-display text-[22px] font-medium leading-none text-white sm:text-[26px]"
             >
               Select a track
             </div>
+
             <div
               id="trackArtist"
-              class="mt-2 truncate font-['JetBrains_Mono'] text-[9px] tracking-widest text-white/50"
+              class="mt-2 truncate font-mono text-[9px] tracking-widest text-white/50"
             >
               BUNDELKHAND FM
             </div>
@@ -370,150 +233,117 @@
             <div class="mt-5 flex items-center gap-4">
               <span
                 id="currentTime"
-                class="w-8 shrink-0 font-['JetBrains_Mono'] text-[10px] text-white/70"
-                >0:00</span
+                class="w-8 shrink-0 font-mono text-[10px] text-white/70"
               >
-              <div class="progress-area" id="progressArea">
+                0:00
+              </span>
+
+              <div id="progressArea" class="progress-area">
                 <div id="progressTrack" class="progress-track">
                   <div id="progressFill" class="progress-fill"></div>
                 </div>
               </div>
+
               <span
                 id="duration"
-                class="w-8 shrink-0 text-right font-['JetBrains_Mono'] text-[10px] text-white/70"
-                >0:00</span
+                class="w-8 shrink-0 text-right font-mono text-[10px] text-white/70"
               >
+                0:00
+              </span>
             </div>
           </div>
 
-          <!-- Desktop Layout: Middle Info, Controls, Right Action -->
-          <div class="hidden lg:flex items-center gap-8 shrink-0">
-            <!-- Separator -->
-            <div class="w-px h-14 bg-white/10"></div>
+          <div class="hidden shrink-0 items-center gap-8 lg:flex">
+            <div class="h-14 w-px bg-white/10"></div>
 
-            <!-- Middle: Route Info -->
-            <div class="flex flex-col justify-center">
+            <div>
+              <p class="font-display text-lg font-semibold">
+                Jalaun
+                <i class="fa-solid fa-arrow-right-long mx-1 text-xs"></i>
+                Sagar
+              </p>
+
               <div
-                id="routeText"
-                class="font-['Khand'] text-[18px] font-medium leading-none text-white"
-              >
-                Jalaun <span class="text-white/50 mx-1">→</span> Sagar
-              </div>
-              <div
-                class="mt-1.5 font-['JetBrains_Mono'] text-[8px] tracking-[.2em] text-white/40"
+                class="mt-1.5 font-mono text-[8px] tracking-[.2em] text-white/40"
               >
                 VIA MAHOBA
               </div>
             </div>
 
-            <!-- Controls -->
-            <div class="flex items-center gap-6 ml-4">
+            <div class="ml-2 flex items-center gap-6">
               <button
                 id="prevBtn"
-                class="control-btn font-['JetBrains_Mono'] text-[9px] tracking-widest text-white/50 focus:outline-none"
                 aria-label="Previous Track"
+                class="text-white/50 transition hover:text-signal"
               >
-                PREV
+                <i class="fa-solid fa-backward-step"></i>
               </button>
 
               <button
                 id="playBtn"
-                class="play-btn flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full bg-[#f2b400] text-black shadow-lg focus:outline-none"
                 aria-label="Play/Pause"
+                class="transition hover:scale-105"
               >
-                <svg
+                <i
                   id="playIcon"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  class="ml-1"
-                >
-                  <path
-                    d="M8 5.2v13.6c0 .8.9 1.3 1.6.8l10-6.8c.6-.4.6-1.3 0-1.7l-10-6.8C8.9 3.9 8 4.4 8 5.2Z"
-                  />
-                </svg>
+                  class="fa-solid fa-circle-play text-[2.4rem] text-signal"
+                ></i>
               </button>
 
               <button
                 id="nextBtn"
-                class="control-btn font-['JetBrains_Mono'] text-[9px] tracking-widest text-white/50 focus:outline-none"
                 aria-label="Next Track"
+                class="text-white/50 transition hover:text-signal"
               >
-                NEXT
+                <i class="fa-solid fa-forward-step"></i>
               </button>
             </div>
 
-            <!-- Separator -->
-            <div class="w-px h-14 bg-white/10"></div>
+            <div class="h-14 w-px bg-white/10"></div>
 
-            <!-- Right Action -->
             <button
               id="chooseBtn"
-              class="rounded-[8px] border border-white/20 bg-transparent px-5 py-2.5 font-['JetBrains_Mono'] text-[9px] tracking-[.15em] text-white transition hover:bg-white/5 focus:outline-none"
+              class="rounded border border-white/20 px-5 py-2.5 font-mono text-[9px] tracking-[.15em] text-white transition hover:bg-white/5"
             >
               CHOOSE TRACK
             </button>
           </div>
 
-          <!-- Mobile Fallback Controls -->
           <div
-            class="flex items-center justify-between gap-4 lg:hidden mt-2 border-t border-white/10 pt-4"
+            class="flex items-center justify-between border-t border-white/10 pt-4 lg:hidden"
           >
-            <div class="flex flex-col">
-              <div
-                class="font-['Khand'] text-[16px] font-medium leading-none text-white"
+            <div class="flex items-center gap-6">
+              <button
+                id="prevBtnMob"
+                aria-label="Previous Track"
+                class="text-white/50 transition hover:text-signal"
               >
-                Jalaun → Sagar
-              </div>
-              <div
-                class="mt-1 font-['JetBrains_Mono'] text-[7px] tracking-widest text-white/40"
-              >
-                VIA MAHOBA
-              </div>
-            </div>
-            <div class="flex items-center gap-4">
-              <button id="prevBtnMob" class="text-white/50">
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path d="M16 4v16L6 12z" />
-                </svg>
+                <i class="fa-solid fa-backward-step"></i>
               </button>
+
               <button
                 id="playBtnMob"
-                class="flex h-10 w-10 items-center justify-center rounded-full bg-[#f2b400] text-black"
+                aria-label="Play/Pause"
+                class="transition hover:scale-105"
               >
-                <svg
+                <i
                   id="playIconMob"
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  class="ml-0.5"
-                >
-                  <path
-                    d="M8 5.2v13.6c0 .8.9 1.3 1.6.8l10-6.8c.6-.4.6-1.3 0-1.7l-10-6.8C8.9 3.9 8 4.4 8 5.2Z"
-                  />
-                </svg>
+                  class="fa-solid fa-circle-play text-[2.4rem] text-signal"
+                ></i>
               </button>
-              <button id="nextBtnMob" class="text-white/50">
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path d="M8 4v16l10-8z" />
-                </svg>
+
+              <button
+                id="nextBtnMob"
+                aria-label="Next Track"
+                class="text-white/50 transition hover:text-signal"
+              >
+                <i class="fa-solid fa-forward-step"></i>
               </button>
             </div>
+
             <button
               id="chooseBtnMob"
-              class="rounded-md border border-white/20 px-3 py-1.5 font-['JetBrains_Mono'] text-[8px] tracking-widest text-white"
+              class="border border-white/20 px-3 py-1.5 font-mono text-[8px] tracking-widest text-white"
             >
               TRACKS
             </button>
@@ -521,23 +351,18 @@
         </section>
       </div>
 
-      <!-- Bottom Corners Typography -->
       <footer
-        class="absolute bottom-6 left-6 right-6 z-30 flex items-end justify-between sm:bottom-10 sm:left-10 sm:right-10 pointer-events-none"
+        class="pointer-events-none absolute bottom-6 left-6 right-6 z-30 sm:bottom-10 sm:left-10 sm:right-10"
       >
         <div class="flex items-center gap-4">
-          <span class="h-[1px] w-8 bg-[#f2b400]"></span>
+          <i class="fa-solid fa-grip-lines text-signal"></i>
+
           <div
-            class="font-['JetBrains_Mono'] text-[9px] tracking-[.25em] text-white/60 leading-relaxed"
+            class="font-mono text-[9px] leading-relaxed tracking-[.25em] text-white/60"
           >
             <span class="block">MUSIC MAKES</span>
             <span class="block">JOURNEYS BETTER</span>
           </div>
-        </div>
-        <div
-          class="font-['JetBrains_Mono'] text-[10px] tracking-[.3em] text-white/40"
-        >
-          BKD · FM
         </div>
       </footer>
 
@@ -546,27 +371,19 @@
         class="pointer-events-none absolute inset-0 z-10 hidden overflow-hidden"
       ></div>
 
-      <!-- Modal -->
       <div
         id="trackModal"
         class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center px-5"
       >
         <div
-          class="modal-card w-full max-w-[520px] rounded-[22px] p-5 sm:p-6"
+          class="modal-card w-full max-w-[520px] rounded p-5 sm:p-6"
           role="dialog"
           aria-modal="true"
-          aria-labelledby="modalTitle"
         >
           <div class="flex items-center justify-between">
             <div>
-              <div
-                class="font-['JetBrains_Mono'] text-[7px] tracking-[.2em] text-[#f2b400]"
-              >
-                BUNDELKHAND FM
-              </div>
               <h2
-                id="modalTitle"
-                class="mt-1 font-['Khand'] text-[27px] font-medium leading-none"
+                class="mt-1 font-display text-[27px] font-medium leading-none"
               >
                 Choose a track
               </h2>
@@ -574,34 +391,24 @@
 
             <button
               id="closeModal"
-              class="rounded-full border border-white/10 px-3 py-1.5 font-['JetBrains_Mono'] text-[7px] tracking-[.12em] text-[#eef1e2]/55 transition hover:bg-white/5 hover:text-white focus:outline-none focus:ring-2 focus:ring-white/20"
-              aria-label="Close modal"
+              aria-label="Close"
+              class="text-white/60 transition hover:text-white"
             >
-              CLOSE
+              <i class="fa-solid fa-xmark text-lg"></i>
             </button>
           </div>
 
-          <div class="mt-5">
-            <div class="relative">
-              <svg
-                class="absolute left-3 top-1/2 -translate-y-1/2 text-white/30"
-                width="13"
-                height="13"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <circle cx="11" cy="11" r="7"></circle>
-                <path d="m20 20-4-4"></path>
-              </svg>
-              <input
-                id="searchInput"
-                type="text"
-                placeholder="Search track..."
-                class="w-full rounded-xl border border-white/10 bg-white/[0.035] py-3 pl-9 pr-4 font-['JetBrains_Mono'] text-[10px] text-white outline-none placeholder:text-white/30 focus:border-[#f2b400]/60 transition-colors"
-              />
-            </div>
+          <div class="relative mt-5">
+            <i
+              class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-white/30"
+            ></i>
+
+            <input
+              id="searchInput"
+              type="text"
+              placeholder="Search track..."
+              class="w-full rounded border border-white/10 bg-white/[.035] py-3 pl-9 pr-4 font-mono text-[10px] text-white outline-none placeholder:text-white/30 focus:border-signal/60"
+            />
           </div>
 
           <div
@@ -613,364 +420,358 @@
     </main>
 
     <script>
-      (function () {
-        const TRACKS = [
-          {
-            title: "Aaye Ho Meri Zindagi Mein",
-            artist: "Alka Yagnik · Raja Hindustani",
-            file: "music/Aaye Ho Meri Zindagi Mein ALKA YAGNIK Raja Hindustani 1996.mp3",
-          },
-          {
-            title: "Pehla Nasha Pehla Khumar",
-            artist: "Udit Narayan · Sadhana Sargam",
-            file: "music/Pehla Nasha Pehla khumar Full HD I Udit Narayan,Sadhana sargam I Jo Jeeta wohi sikandar.mp3",
-          },
-        ];
+      const TRACKS = [
+        {
+          title: "Aaye Ho Meri Zindagi Mein",
+          artist: "Alka Yagnik · Raja Hindustani",
+          file: "music/Aaye Ho Meri Zindagi Mein ALKA YAGNIK Raja Hindustani 1996.mp3",
+        },
+        {
+          title: "Pehla Nasha Pehla Khumar",
+          artist: "Udit Narayan · Sadhana Sargam",
+          file: "music/Pehla Nasha Pehla khumar Full HD I Udit Narayan,Sadhana sargam I Jo Jeeta wohi sikandar.mp3",
+        },
+      ];
 
-        const BG = {
-          day: "./background/day.mp4",
-          night: "./background/night.mp4",
-        };
+      const BG = {
+        day: "./background/day.mp4",
+        night: "./background/night.mp4",
+      };
 
-        const DOM = {
-          backgroundVideo: document.getElementById("backgroundVideo"),
-          playBtns: [
-            document.getElementById("playBtn"),
-            document.getElementById("playBtnMob"),
-          ],
-          playIcons: [
-            document.getElementById("playIcon"),
-            document.getElementById("playIconMob"),
-          ],
-          prevBtns: [
-            document.getElementById("prevBtn"),
-            document.getElementById("prevBtnMob"),
-          ],
-          nextBtns: [
-            document.getElementById("nextBtn"),
-            document.getElementById("nextBtnMob"),
-          ],
-          chooseBtns: [
-            document.getElementById("chooseBtn"),
-            document.getElementById("chooseBtnMob"),
-          ],
-          rainBtn: document.getElementById("rainBtn"),
-          modeBtn: document.getElementById("modeBtn"),
-          trackTitle: document.getElementById("trackTitle"),
-          trackArtist: document.getElementById("trackArtist"),
-          currentTime: document.getElementById("currentTime"),
-          duration: document.getElementById("duration"),
-          progressArea: document.getElementById("progressArea"),
-          progressFill: document.getElementById("progressFill"),
-          trackModal: document.getElementById("trackModal"),
-          closeModal: document.getElementById("closeModal"),
-          searchInput: document.getElementById("searchInput"),
-          trackList: document.getElementById("trackList"),
-          rain: document.getElementById("rain"),
-        };
+      const $ = (id) => document.getElementById(id);
 
-        const state = {
-          currentIndex: 0,
-          isPlaying: false,
-          mode: "night",
-          rainEnabled: false,
-          isDraggingProgress: false,
-        };
+      const DOM = {
+        video: $("backgroundVideo"),
+        playBtns: [$("playBtn"), $("playBtnMob")],
+        prevBtns: [$("prevBtn"), $("prevBtnMob")],
+        nextBtns: [$("nextBtn"), $("nextBtnMob")],
+        chooseBtns: [$("chooseBtn"), $("chooseBtnMob")],
+        rainBtn: $("rainBtn"),
+        modeBtn: $("modeBtn"),
+        title: $("trackTitle"),
+        artist: $("trackArtist"),
+        current: $("currentTime"),
+        duration: $("duration"),
+        progress: $("progressArea"),
+        fill: $("progressFill"),
+        modal: $("trackModal"),
+        close: $("closeModal"),
+        search: $("searchInput"),
+        list: $("trackList"),
+        rain: $("rain"),
+      };
 
-        const audio = new Audio();
-        audio.preload = "metadata";
+      const audio = new Audio();
+      audio.preload = "metadata";
 
-        function formatTime(seconds) {
-          if (!Number.isFinite(seconds)) return "0:00";
-          const minutes = Math.floor(seconds / 60);
-          const secs = Math.floor(seconds % 60)
-            .toString()
-            .padStart(2, "0");
-          return `${minutes}:${secs}`;
-        }
+      let currentIndex = 0;
+      let mode = "night";
+      let rainEnabled = false;
+      let dragging = false;
 
-        function updatePlayIcon() {
-          DOM.playIcons.forEach((icon) => {
-            if (!icon) return;
-            if (state.isPlaying) {
-              icon.innerHTML = `<rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect>`;
-              icon.classList.remove("ml-1", "ml-0.5"); // Remove triangle offset
-            } else {
-              icon.innerHTML = `<path d="M8 5.2v13.6c0 .8.9 1.3 1.6.8l10-6.8c.6-.4.6-1.3 0-1.7l-10-6.8C8.9 3.9 8 4.4 8 5.2Z"/>`;
-              icon.classList.add(icon.id.includes("Mob") ? "ml-0.5" : "ml-1"); // Re-add visual center offset
-            }
-          });
-        }
+      const formatTime = (seconds) => {
+        if (!Number.isFinite(seconds)) return "0:00";
+        return `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, "0")}`;
+      };
 
-        function loadTrack(index, autoplay = false) {
-          state.currentIndex = (index + TRACKS.length) % TRACKS.length;
-          const track = TRACKS[state.currentIndex];
+      function updatePlayIcon() {
+        DOM.playBtns.forEach((btn) => {
+          if (!btn) return;
+          btn.innerHTML = audio.paused
+            ? '<i class="fa-solid fa-circle-play text-[2.4rem] text-signal"></i>'
+            : '<i class="fa-solid fa-circle-pause text-[2.4rem] text-signal"></i>';
+        });
+      }
 
-          DOM.trackTitle.textContent = track.title;
-          DOM.trackArtist.textContent = track.artist;
+      function loadTrack(index, autoplay = false) {
+        currentIndex = (index + TRACKS.length) % TRACKS.length;
+        const track = TRACKS[currentIndex];
 
-          audio.src = track.file;
-          audio.load();
+        DOM.title.textContent = track.title;
+        DOM.artist.textContent = track.artist;
 
-          DOM.currentTime.textContent = "0:00";
-          DOM.duration.textContent = "0:00";
-          DOM.progressFill.style.width = "0%";
+        audio.pause();
+        audio.src = encodeURI(track.file);
+        audio.load();
 
-          if (autoplay) {
-            audio
-              .play()
-              .then(() => {
-                state.isPlaying = true;
-                updatePlayIcon();
-              })
-              .catch(() => {
-                state.isPlaying = false;
-                updatePlayIcon();
-              });
-          } else {
-            state.isPlaying = false;
-            updatePlayIcon();
-          }
+        DOM.current.textContent = "0:00";
+        DOM.duration.textContent = "0:00";
+        DOM.fill.style.width = "0%";
 
-          if (DOM.trackModal.classList.contains("is-open")) {
-            renderTracks(DOM.searchInput.value);
-          }
-        }
+        renderTracks(DOM.search.value);
+        updatePlayIcon();
 
-        function togglePlay() {
-          if (!audio.src) {
-            loadTrack(state.currentIndex, true);
-            return;
-          }
-          if (audio.paused) {
-            audio
-              .play()
-              .then(() => {
-                state.isPlaying = true;
-                updatePlayIcon();
-              })
-              .catch(() => {});
-          } else {
-            audio.pause();
-            state.isPlaying = false;
-            updatePlayIcon();
-          }
-        }
-
-        function renderTracks(query = "") {
-          const value = query.trim().toLowerCase();
-          const filtered = TRACKS.map((track, index) => ({
-            ...track,
-            index,
-          })).filter((track) =>
-            `${track.title} ${track.artist}`.toLowerCase().includes(value),
-          );
-
-          if (!filtered.length) {
-            DOM.trackList.innerHTML = `<div class="py-8 text-center font-['JetBrains_Mono'] text-[8px] tracking-[.1em] text-white/30">NO TRACK FOUND</div>`;
-            return;
-          }
-
-          DOM.trackList.innerHTML = filtered
-            .map((track) => {
-              const isActive = track.index === state.currentIndex;
-              return `
-              <button data-index="${track.index}" class="track-item flex w-full items-center justify-between gap-4 rounded-xl border border-transparent px-3 py-3 text-left ${isActive ? "active" : ""}">
-                <div class="min-w-0">
-                  <div class="truncate font-['Khand'] text-[17px] leading-none ${isActive ? "text-[#f2b400]" : "text-white"}">${track.title}</div>
-                  <div class="mt-1 truncate font-['JetBrains_Mono'] text-[8px] tracking-widest ${isActive ? "text-[#f2b400]/70" : "text-white/40"}">${track.artist}</div>
-                </div>
-                <span class="shrink-0 font-['JetBrains_Mono'] text-[8px] tracking-widest ${isActive ? "text-[#f2b400]" : "text-[#f2b400]/70"}">${isActive ? "PLAYING" : "PLAY"}</span>
-              </button>
-            `;
-            })
-            .join("");
-
-          DOM.trackList.querySelectorAll("[data-index]").forEach((button) => {
-            button.addEventListener("click", () => {
-              loadTrack(Number(button.dataset.index), true);
-              closeTrackModal();
+        if (autoplay) {
+          audio
+            .play()
+            .then(updatePlayIcon)
+            .catch((error) => {
+              console.error("Audio playback failed:", error);
+              console.error("File:", track.file);
+              updatePlayIcon();
             });
-          });
+        }
+      }
+
+      function togglePlay() {
+        if (!audio.src) {
+          loadTrack(currentIndex, true);
+          return;
         }
 
-        function openTrackModal() {
-          renderTracks(DOM.searchInput.value);
-          DOM.trackModal.classList.add("is-open");
-          setTimeout(() => DOM.searchInput.focus(), 100);
-        }
-
-        function closeTrackModal() {
-          DOM.trackModal.classList.remove("is-open");
-          DOM.searchInput.value = "";
-        }
-
-        function setMode(nextMode) {
-          state.mode = nextMode;
-          DOM.backgroundVideo.style.opacity = "0";
-
-          setTimeout(() => {
-            DOM.backgroundVideo.src = BG[state.mode];
-            DOM.backgroundVideo.load();
-            DOM.backgroundVideo.play().catch(() => {});
-            DOM.backgroundVideo.style.opacity = "1";
-          }, 300);
-
-          DOM.modeBtn.innerHTML =
-            state.mode === "night"
-              ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg> Day`
-              : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg> Night`;
-        }
-
-        function createRain() {
-          DOM.rain.innerHTML = "";
-          const amount = window.innerWidth < 768 ? 80 : 150;
-          const fragment = document.createDocumentFragment();
-          for (let i = 0; i < amount; i++) {
-            const drop = document.createElement("span");
-            drop.className = "rain-drop";
-            drop.style.left = `${Math.random() * 110}%`;
-            drop.style.animationDuration = `${0.45 + Math.random() * 0.7}s`;
-            drop.style.animationDelay = `${Math.random() * 1.5}s`;
-            drop.style.opacity = `${0.12 + Math.random() * 0.25}`;
-            drop.style.height = `${18 + Math.random() * 22}px`;
-            fragment.appendChild(drop);
-          }
-          DOM.rain.appendChild(fragment);
-        }
-
-        function toggleRain() {
-          state.rainEnabled = !state.rainEnabled;
-          if (state.rainEnabled) {
-            createRain();
-            DOM.rain.classList.remove("hidden");
-            DOM.rainBtn.classList.add(
-              "bg-[#f2b400]/20",
-              "border-[#f2b400]/50",
-              "text-[#f2b400]",
-            );
-          } else {
-            DOM.rain.classList.add("hidden");
-            DOM.rainBtn.classList.remove(
-              "bg-[#f2b400]/20",
-              "border-[#f2b400]/50",
-              "text-[#f2b400]",
-            );
-          }
-        }
-
-        function updateProgressFromEvent(event) {
-          if (!audio.duration) return;
-          const rect = DOM.progressArea.getBoundingClientRect();
-          const clientX = event.touches
-            ? event.touches[0].clientX
-            : event.clientX;
-          let percent = (clientX - rect.left) / rect.width;
-          percent = Math.max(0, Math.min(1, percent));
-
-          DOM.progressFill.style.width = `${percent * 100}%`;
-          if (!state.isDraggingProgress) {
-            audio.currentTime = percent * audio.duration;
-          }
-        }
-
-        DOM.progressArea.addEventListener("pointerdown", (e) => {
-          state.isDraggingProgress = true;
-          updateProgressFromEvent(e);
-          DOM.progressArea.setPointerCapture(e.pointerId);
-        });
-
-        DOM.progressArea.addEventListener("pointermove", (e) => {
-          if (state.isDraggingProgress) updateProgressFromEvent(e);
-        });
-
-        DOM.progressArea.addEventListener("pointerup", (e) => {
-          if (state.isDraggingProgress) {
-            state.isDraggingProgress = false;
-            updateProgressFromEvent(e);
-          }
-        });
-
-        DOM.progressArea.addEventListener("pointercancel", () => {
-          state.isDraggingProgress = false;
-        });
-
-        // Event Bindings for Controls (handling both desktop and mobile versions if present)
-        DOM.playBtns.forEach(
-          (btn) => btn && btn.addEventListener("click", togglePlay),
-        );
-        DOM.nextBtns.forEach(
-          (btn) =>
-            btn &&
-            btn.addEventListener("click", () =>
-              loadTrack(state.currentIndex + 1, true),
-            ),
-        );
-        DOM.prevBtns.forEach(
-          (btn) =>
-            btn &&
-            btn.addEventListener("click", () =>
-              loadTrack(state.currentIndex - 1, true),
-            ),
-        );
-        DOM.chooseBtns.forEach(
-          (btn) => btn && btn.addEventListener("click", openTrackModal),
-        );
-
-        DOM.closeModal.addEventListener("click", closeTrackModal);
-        DOM.rainBtn.addEventListener("click", toggleRain);
-        DOM.modeBtn.addEventListener("click", () =>
-          setMode(state.mode === "night" ? "day" : "night"),
-        );
-        DOM.searchInput.addEventListener("input", () =>
-          renderTracks(DOM.searchInput.value),
-        );
-        DOM.trackModal.addEventListener("click", (e) => {
-          if (e.target === DOM.trackModal) closeTrackModal();
-        });
-
-        audio.addEventListener("loadedmetadata", () => {
-          DOM.duration.textContent = formatTime(audio.duration);
-        });
-        audio.addEventListener("timeupdate", () => {
-          if (!state.isDraggingProgress) {
-            DOM.currentTime.textContent = formatTime(audio.currentTime);
-            if (audio.duration)
-              DOM.progressFill.style.width = `${(audio.currentTime / audio.duration) * 100}%`;
-          }
-        });
-        audio.addEventListener("play", () => {
-          state.isPlaying = true;
+        if (audio.paused) {
+          audio
+            .play()
+            .then(updatePlayIcon)
+            .catch((error) => {
+              console.error("Playback failed:", error);
+              updatePlayIcon();
+            });
+        } else {
+          audio.pause();
           updatePlayIcon();
-        });
-        audio.addEventListener("pause", () => {
-          state.isPlaying = false;
-          updatePlayIcon();
-        });
-        audio.addEventListener("ended", () =>
-          loadTrack(state.currentIndex + 1, true),
+        }
+      }
+
+      function renderTracks(query = "") {
+        const value = query.trim().toLowerCase();
+
+        const tracks = TRACKS.map((track, index) => ({
+          ...track,
+          index,
+        })).filter((track) =>
+          `${track.title} ${track.artist}`.toLowerCase().includes(value),
         );
 
-        document.addEventListener("keydown", (event) => {
-          if (event.code === "Space" && event.target.tagName !== "INPUT") {
-            event.preventDefault();
-            togglePlay();
-          }
-          if (
-            event.code === "Escape" &&
-            DOM.trackModal.classList.contains("is-open")
-          )
-            closeTrackModal();
-          if (event.code === "ArrowRight" && event.target.tagName !== "INPUT")
-            loadTrack(state.currentIndex + 1, true);
-          if (event.code === "ArrowLeft" && event.target.tagName !== "INPUT")
-            loadTrack(state.currentIndex - 1, true);
-        });
+        if (!tracks.length) {
+          DOM.list.innerHTML = `
+      <div class="py-8 text-center font-mono text-[8px] tracking-[.1em] text-white/30">
+        NO TRACK FOUND
+      </div>
+    `;
+          return;
+        }
 
-        DOM.backgroundVideo.src = BG.night;
-        DOM.backgroundVideo.play().catch(() => {});
-        loadTrack(0, false);
-      })();
+        DOM.list.innerHTML = tracks
+          .map((track) => {
+            const active = track.index === currentIndex;
+
+            return `
+      <button
+        data-index="${track.index}"
+        class="track-item flex w-full items-center justify-between gap-4 rounded border px-3 py-3 text-left ${
+          active ? "border-signal/30 bg-signal/10" : "border-transparent"
+        }"
+      >
+        <div class="min-w-0">
+          <div class="truncate font-display text-[17px] leading-none ${
+            active ? "text-signal" : "text-white"
+          }">
+            ${track.title}
+          </div>
+          <div class="mt-1 truncate font-mono text-[8px] tracking-widest ${
+            active ? "text-signal/70" : "text-white/40"
+          }">
+            ${track.artist}
+          </div>
+        </div>
+      </button>
+    `;
+          })
+          .join("");
+      }
+
+      function openModal() {
+        renderTracks(DOM.search.value);
+        DOM.modal.classList.remove("opacity-0", "invisible");
+        DOM.modal.classList.add("opacity-100", "visible");
+        setTimeout(() => DOM.search.focus(), 100);
+      }
+
+      function closeModal() {
+        DOM.modal.classList.remove("opacity-100", "visible");
+        DOM.modal.classList.add("opacity-0", "invisible");
+        DOM.search.value = "";
+      }
+
+      function setMode(next) {
+        mode = next;
+        DOM.video.classList.add("opacity-0");
+
+        setTimeout(() => {
+          DOM.video.src = BG[mode];
+          DOM.video.load();
+          DOM.video.play().catch(() => {});
+          DOM.video.classList.remove("opacity-0");
+        }, 300);
+
+        DOM.modeBtn.innerHTML =
+          mode === "night"
+            ? '<i class="fa-solid fa-sun mr-1"></i> Day'
+            : '<i class="fa-solid fa-moon mr-1"></i> Night';
+      }
+
+      function createRain() {
+        DOM.rain.innerHTML = "";
+        const amount = innerWidth < 768 ? 80 : 150;
+        const fragment = document.createDocumentFragment();
+
+        for (let i = 0; i < amount; i++) {
+          const drop = document.createElement("span");
+          drop.className =
+            "absolute top-[-40px] pointer-events-none w-px bg-[rgba(220,235,255,.18)] rotate-[12deg] animate-rain";
+          drop.style.left = `${Math.random() * 110}%`;
+          drop.style.animationDuration = `${0.45 + Math.random() * 0.7}s`;
+          drop.style.animationDelay = `${Math.random() * 1.5}s`;
+          drop.style.opacity = `${0.12 + Math.random() * 0.25}`;
+          drop.style.height = `${18 + Math.random() * 22}px`;
+          fragment.appendChild(drop);
+        }
+
+        DOM.rain.appendChild(fragment);
+      }
+
+      function toggleRain() {
+        rainEnabled = !rainEnabled;
+
+        if (rainEnabled) {
+          createRain();
+          DOM.rain.classList.remove("hidden");
+          DOM.rainBtn.classList.add(
+            "border-signal/50",
+            "bg-signal/15",
+            "text-signal",
+          );
+        } else {
+          DOM.rain.classList.add("hidden");
+          DOM.rainBtn.classList.remove(
+            "border-signal/50",
+            "bg-signal/15",
+            "text-signal",
+          );
+        }
+      }
+
+      function updateProgress(e) {
+        if (!audio.duration) return;
+
+        const rect = DOM.progress.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const percent = Math.max(0, Math.min(1, x / rect.width));
+
+        DOM.fill.style.width = `${percent * 100}%`;
+
+        if (dragging) audio.currentTime = percent * audio.duration;
+      }
+
+      DOM.playBtns.forEach((btn) => {
+        if (btn) btn.addEventListener("click", togglePlay);
+      });
+
+      DOM.nextBtns.forEach((btn) => {
+        if (btn)
+          btn.addEventListener("click", () =>
+            loadTrack(currentIndex + 1, true),
+          );
+      });
+
+      DOM.prevBtns.forEach((btn) => {
+        if (btn)
+          btn.addEventListener("click", () =>
+            loadTrack(currentIndex - 1, true),
+          );
+      });
+
+      DOM.chooseBtns.forEach((btn) => {
+        if (btn) btn.addEventListener("click", openModal);
+      });
+
+      DOM.close.addEventListener("click", closeModal);
+      DOM.rainBtn.addEventListener("click", toggleRain);
+
+      DOM.modeBtn.addEventListener("click", () => {
+        setMode(mode === "night" ? "day" : "night");
+      });
+
+      DOM.search.addEventListener("input", () => {
+        renderTracks(DOM.search.value);
+      });
+
+      DOM.list.addEventListener("click", (e) => {
+        const button = e.target.closest("[data-index]");
+        if (!button) return;
+        loadTrack(Number(button.dataset.index), true);
+        closeModal();
+      });
+
+      DOM.modal.addEventListener("click", (e) => {
+        if (e.target === DOM.modal) closeModal();
+      });
+
+      DOM.progress.addEventListener("pointerdown", (e) => {
+        dragging = true;
+        DOM.progress.setPointerCapture(e.pointerId);
+        updateProgress(e);
+      });
+
+      DOM.progress.addEventListener("pointermove", (e) => {
+        if (dragging) updateProgress(e);
+      });
+
+      DOM.progress.addEventListener("pointerup", (e) => {
+        dragging = false;
+        updateProgress(e);
+      });
+
+      DOM.progress.addEventListener("pointercancel", () => {
+        dragging = false;
+      });
+
+      audio.addEventListener("loadedmetadata", () => {
+        DOM.duration.textContent = formatTime(audio.duration);
+      });
+
+      audio.addEventListener("timeupdate", () => {
+        if (dragging) return;
+
+        DOM.current.textContent = formatTime(audio.currentTime);
+
+        if (audio.duration) {
+          DOM.fill.style.width = `${(audio.currentTime / audio.duration) * 100}%`;
+        }
+      });
+
+      audio.addEventListener("play", updatePlayIcon);
+      audio.addEventListener("pause", updatePlayIcon);
+
+      audio.addEventListener("error", () => {
+        console.error("Could not load audio:", TRACKS[currentIndex].file);
+        updatePlayIcon();
+      });
+
+      audio.addEventListener("ended", () => {
+        loadTrack(currentIndex + 1, true);
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.target.tagName === "INPUT") return;
+
+        if (e.code === "Space") {
+          e.preventDefault();
+          togglePlay();
+        }
+
+        if (e.code === "Escape") closeModal();
+        if (e.code === "ArrowRight") loadTrack(currentIndex + 1, true);
+        if (e.code === "ArrowLeft") loadTrack(currentIndex - 1, true);
+      });
+
+      DOM.video.src = BG.night;
+      DOM.video.play().catch(() => {});
+
+      loadTrack(0);
+      renderTracks();
+      updatePlayIcon();
     </script>
   </body>
 </html>

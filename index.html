@@ -4,9 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Bundelkhand FM</title>
+    <title>Bundelkhand FM Application</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="./favicon.ico" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -15,6 +16,11 @@
       href="https://fonts.googleapis.com/css2?family=Khand:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap"
       rel="stylesheet"
     />
+
+    <script
+      src="https://kit.fontawesome.com/97fba59076.js"
+      crossorigin="anonymous"
+    ></script>
 
     <script>
       tailwind.config = {
@@ -55,7 +61,7 @@
       >
         <section class="hidden lg:block">
           <div class="mb-7 flex items-center gap-3">
-            <span class="h-px w-10 bg-[#f2b400]"></span>
+            <i class="fa-solid fa-grip-lines text-[#f2b400]"></i>
 
             <span
               class="font-mono text-[10px] uppercase tracking-[0.22em] text-[#b9c0cf]"
@@ -78,25 +84,17 @@
 
           <div class="mt-10 flex items-center gap-4">
             <div
-              class="rounded-full border border-white/10 bg-black/20 px-4 py-2 backdrop-blur-sm"
+              class="uppercase text-xs font-mono tracking-widest text-[#b9c0cf] rounded-full border border-white/10 bg-black/20 px-4 py-2 backdrop-blur-sm"
             >
-              <span
-                class="font-mono text-[10px] uppercase tracking-widest text-[#b9c0cf]"
-              >
-                Uttar Pradesh
-              </span>
+              Uttar Pradesh
             </div>
 
-            <span class="text-[#f2b400]">—</span>
+            <i class="fa-solid fa-arrows-left-right text-[#f2b400] text-xs"></i>
 
             <div
-              class="rounded-full border border-white/10 bg-black/20 px-4 py-2 backdrop-blur-sm"
+              class="uppercase text-xs font-mono tracking-widest text-[#b9c0cf] rounded-full border border-white/10 bg-black/20 px-4 py-2 backdrop-blur-sm"
             >
-              <span
-                class="font-mono text-[10px] uppercase tracking-widest text-[#b9c0cf]"
-              >
-                Madhya Pradesh
-              </span>
+              Madhya Pradesh
             </div>
           </div>
         </section>
@@ -104,7 +102,7 @@
         <div class="w-full">
           <div class="mb-6 lg:hidden">
             <div class="flex items-center gap-3">
-              <span class="h-px w-8 bg-[#f2b400]"></span>
+              <i class="fa-solid fa-grip-lines text-[#f2b400]"></i>
 
               <span
                 class="font-mono text-[10px] uppercase tracking-[0.22em] text-[#b9c0cf]"
@@ -172,21 +170,9 @@
                     type="button"
                     class="group mt-4 inline-flex items-center gap-2 text-xs font-medium text-[#c98f00] transition hover:text-[#1d2116]"
                   >
-                    <svg
-                      class="transition duration-500 group-hover:rotate-180"
-                      width="14"
-                      height="14"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                    >
-                      <path
-                        d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2v3h-3"
-                        stroke="currentColor"
-                        stroke-width="1.4"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                    </svg>
+                    <i
+                      class="fa-solid fa-arrow-rotate-right transition duration-500 group-hover:rotate-180"
+                    ></i>
 
                     Shuffle passenger
                   </button>
@@ -203,7 +189,9 @@
                     </p>
 
                     <p class="mt-1 font-display text-lg font-semibold">
-                      Jalaun → Sagar
+                      Jalaun
+                      <i class="fa-solid fa-arrow-right-long text-xs"></i>
+                      Sagar
                     </p>
                   </div>
 
@@ -229,19 +217,9 @@
                     Start journey
                   </span>
 
-                  <span
-                    class="flex h-8 w-8 items-center justify-center rounded-full bg-[#f2b400] text-[#1d2116] transition-transform duration-200 group-hover:translate-x-1"
-                  >
-                    <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
-                      <path
-                        d="M3 8h9M9 4l4 4-4 4"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                    </svg>
-                  </span>
+                  <i
+                    class="fa-solid fa-circle-arrow-right text-[#f2b400] w-8 h-8 transition-transform duration-200 group-hover:translate-x-1"
+                  ></i>
                 </button>
               </div>
             </div>
