@@ -1,4 +1,4 @@
-![Uploading image.png…]()
+<img width="1912" height="866" alt="image" src="https://github.com/user-attachments/assets/3105fbf7-5216-482d-9629-0f595958973c" />
 
 # Bundelkhand FM App
 
@@ -28,6 +28,3 @@ We welcome contributions! Please read our contribution guidelines before submitt
 ## Acknowledgments
 - Community support for open‑source collaboration  
 - Inspiration drawn from regional media initiatives  
-
----  
-*For more information, visit the repository on GitHub.*
