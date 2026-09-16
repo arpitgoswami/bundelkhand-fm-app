@@ -60,6 +60,8 @@ const TRACKS = [
 const BG = {
   day: "./background/day.mp4",
   night: "./background/night.mp4",
+  dayMobile: "./background/mob_day.mp4",
+  nightMobile: "./background/mob_night.mp4",
 };
 
 const $ = (id) => document.getElementById(id);
@@ -86,21 +88,64 @@ const DOM = {
 };
 
 const audio = new Audio();
+
 audio.preload = "metadata";
 
 let currentIndex = 0;
 let mode = "night";
 let rainEnabled = false;
 let dragging = false;
+let currentBackground = "";
 
 const formatTime = (seconds) => {
   if (!Number.isFinite(seconds)) return "0:00";
-  return `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, "0")}`;
+
+  return `${Math.floor(seconds / 60)}:${String(
+    Math.floor(seconds % 60),
+  ).padStart(2, "0")}`;
 };
+
+function isMobile() {
+  return window.matchMedia("(max-width: 767px)").matches;
+}
+
+function getBackground() {
+  if (isMobile()) {
+    return mode === "night" ? BG.nightMobile : BG.dayMobile;
+  }
+
+  return mode === "night" ? BG.night : BG.day;
+}
+
+function setBackground(force = false) {
+  const background = getBackground();
+
+  if (!force && background === currentBackground) {
+    return;
+  }
+
+  currentBackground = background;
+
+  DOM.video.classList.add("opacity-0");
+
+  setTimeout(() => {
+    DOM.video.src = background;
+    DOM.video.load();
+
+    const playPromise = DOM.video.play();
+
+    if (playPromise) {
+      playPromise.catch(() => {});
+    }
+
+    DOM.video.classList.remove("opacity-0");
+  }, 300);
+}
 
 function updatePlayIcon() {
   DOM.playBtns.forEach((btn) => {
     if (!btn) return;
+
     btn.innerHTML = audio.paused
       ? '<i class="fa-solid fa-circle-play text-[2.4rem] text-signal"></i>'
       : '<i class="fa-solid fa-circle-pause text-[2.4rem] text-signal"></i>';
@@ -109,13 +154,16 @@ function updatePlayIcon() {
 
 function loadTrack(index, autoplay = false) {
   currentIndex = (index + TRACKS.length) % TRACKS.length;
+
   const track = TRACKS[currentIndex];
 
   DOM.title.textContent = track.title;
   DOM.artist.textContent = track.artist;
 
   audio.pause();
+
   audio.src = encodeURI(track.file);
+
   audio.load();
 
   DOM.current.textContent = "0:00";
@@ -123,6 +171,7 @@ function loadTrack(index, autoplay = false) {
   DOM.fill.style.width = "0%";
 
   renderTracks(DOM.search.value);
+
   updatePlayIcon();
 
   if (autoplay) {
@@ -132,6 +181,7 @@ function loadTrack(index, autoplay = false) {
       .catch((error) => {
         console.error("Audio playback failed:", error);
         console.error("File:", track.file);
+
         updatePlayIcon();
       });
   }
@@ -149,10 +199,12 @@ function togglePlay() {
       .then(updatePlayIcon)
       .catch((error) => {
         console.error("Playback failed:", error);
+
         updatePlayIcon();
       });
   } else {
     audio.pause();
+
     updatePlayIcon();
   }
 }
@@ -173,6 +225,7 @@ function renderTracks(query = "") {
         NO TRACK FOUND
       </div>
     `;
+
     return;
   }
 
@@ -181,53 +234,53 @@ function renderTracks(query = "") {
       const active = track.index === currentIndex;
 
       return `
-      <button
-        data-index="${track.index}"
-        class="track-item flex w-full items-center justify-between gap-4 rounded border px-3 py-3 text-left ${
-          active ? "border-signal/30 bg-signal/10" : "border-transparent"
-        }"
-      >
-        <div class="min-w-0">
-          <div class="truncate font-display text-[17px] leading-none ${
-            active ? "text-signal" : "text-white"
-          }">
-            ${track.title}
+        <button
+          data-index="${track.index}"
+          class="track-item flex w-full items-center justify-between gap-4 rounded border px-3 py-3 text-left ${
+            active ? "border-signal/30 bg-signal/10" : "border-transparent"
+          }"
+        >
+          <div class="min-w-0">
+            <div class="truncate font-display text-[17px] leading-none ${
+              active ? "text-signal" : "text-white"
+            }">
+              ${track.title}
+            </div>
+
+            <div class="mt-1 truncate font-mono text-[8px] tracking-widest ${
+              active ? "text-signal/70" : "text-white/40"
+            }">
+              ${track.artist}
+            </div>
           </div>
-          <div class="mt-1 truncate font-mono text-[8px] tracking-widest ${
-            active ? "text-signal/70" : "text-white/40"
-          }">
-            ${track.artist}
-          </div>
-        </div>
-      </button>
-    `;
+        </button>
+      `;
     })
     .join("");
 }
 
 function openModal() {
   renderTracks(DOM.search.value);
+
   DOM.modal.classList.remove("opacity-0", "invisible");
+
   DOM.modal.classList.add("opacity-100", "visible");
+
   setTimeout(() => DOM.search.focus(), 100);
 }
 
 function closeModal() {
   DOM.modal.classList.remove("opacity-100", "visible");
+
   DOM.modal.classList.add("opacity-0", "invisible");
+
   DOM.search.value = "";
 }
 
 function setMode(next) {
   mode = next;
-  DOM.video.classList.add("opacity-0");
 
-  setTimeout(() => {
-    DOM.video.src = BG[mode];
-    DOM.video.load();
-    DOM.video.play().catch(() => {});
-    DOM.video.classList.remove("opacity-0");
-  }, 300);
+  setBackground(true);
 
   DOM.modeBtn.innerHTML =
     mode === "night"
@@ -239,17 +292,24 @@ function createRain() {
   DOM.rain.innerHTML = "";
 
   const amount = innerWidth < 768 ? 120 : 240;
+
   const fragment = document.createDocumentFragment();
 
   for (let i = 0; i < amount; i++) {
     const drop = document.createElement("span");
 
     drop.className = "rain-drop";
+
     drop.style.left = `${Math.random() * 110}%`;
+
     drop.style.height = `${25 + Math.random() * 45}px`;
+
     drop.style.opacity = `${0.15 + Math.random() * 0.35}`;
+
     drop.style.animationDuration = `${0.35 + Math.random() * 0.8}s`;
+
     drop.style.animationDelay = `${Math.random() * 2}s`;
+
     drop.style.transform = `rotate(${9 + Math.random() * 7}deg)`;
 
     fragment.appendChild(drop);
@@ -263,7 +323,9 @@ function toggleRain() {
 
   if (rainEnabled) {
     createRain();
+
     DOM.rain.classList.remove("hidden");
+
     DOM.rainBtn.classList.add(
       "border-signal/50",
       "bg-signal/15",
@@ -271,6 +333,7 @@ function toggleRain() {
     );
   } else {
     DOM.rain.classList.add("hidden");
+
     DOM.rainBtn.classList.remove(
       "border-signal/50",
       "bg-signal/15",
@@ -283,33 +346,48 @@ function updateProgress(e) {
   if (!audio.duration) return;
 
   const rect = DOM.progress.getBoundingClientRect();
+
   const x = e.clientX - rect.left;
+
   const percent = Math.max(0, Math.min(1, x / rect.width));
 
   DOM.fill.style.width = `${percent * 100}%`;
 
-  if (dragging) audio.currentTime = percent * audio.duration;
+  if (dragging) {
+    audio.currentTime = percent * audio.duration;
+  }
 }
 
 DOM.playBtns.forEach((btn) => {
-  if (btn) btn.addEventListener("click", togglePlay);
+  if (btn) {
+    btn.addEventListener("click", togglePlay);
+  }
 });
 
 DOM.nextBtns.forEach((btn) => {
-  if (btn)
-    btn.addEventListener("click", () => loadTrack(currentIndex + 1, true));
+  if (btn) {
+    btn.addEventListener("click", () => {
+      loadTrack(currentIndex + 1, true);
+    });
+  }
 });
 
 DOM.prevBtns.forEach((btn) => {
-  if (btn)
-    btn.addEventListener("click", () => loadTrack(currentIndex - 1, true));
+  if (btn) {
+    btn.addEventListener("click", () => {
+      loadTrack(currentIndex - 1, true);
+    });
+  }
 });
 
 DOM.chooseBtns.forEach((btn) => {
-  if (btn) btn.addEventListener("click", openModal);
+  if (btn) {
+    btn.addEventListener("click", openModal);
+  }
 });
 
 DOM.close.addEventListener("click", closeModal);
+
 DOM.rainBtn.addEventListener("click", toggleRain);
 
 DOM.modeBtn.addEventListener("click", () => {
@@ -322,27 +400,37 @@ DOM.search.addEventListener("input", () => {
 
 DOM.list.addEventListener("click", (e) => {
   const button = e.target.closest("[data-index]");
+
   if (!button) return;
+
   loadTrack(Number(button.dataset.index), true);
+
   closeModal();
 });
 
 DOM.modal.addEventListener("click", (e) => {
-  if (e.target === DOM.modal) closeModal();
+  if (e.target === DOM.modal) {
+    closeModal();
+  }
 });
 
 DOM.progress.addEventListener("pointerdown", (e) => {
   dragging = true;
+
   DOM.progress.setPointerCapture(e.pointerId);
+
   updateProgress(e);
 });
 
 DOM.progress.addEventListener("pointermove", (e) => {
-  if (dragging) updateProgress(e);
+  if (dragging) {
+    updateProgress(e);
+  }
 });
 
 DOM.progress.addEventListener("pointerup", (e) => {
   dragging = false;
+
   updateProgress(e);
 });
 
@@ -365,10 +453,12 @@ audio.addEventListener("timeupdate", () => {
 });
 
 audio.addEventListener("play", updatePlayIcon);
+
 audio.addEventListener("pause", updatePlayIcon);
 
 audio.addEventListener("error", () => {
   console.error("Could not load audio:", TRACKS[currentIndex].file);
+
   updatePlayIcon();
 });
 
@@ -381,19 +471,51 @@ document.addEventListener("keydown", (e) => {
 
   if (e.code === "Space") {
     e.preventDefault();
+
     togglePlay();
   }
 
-  if (e.code === "Escape") closeModal();
-  if (e.code === "ArrowRight") loadTrack(currentIndex + 1, true);
-  if (e.code === "ArrowLeft") loadTrack(currentIndex - 1, true);
+  if (e.code === "Escape") {
+    closeModal();
+  }
+
+  if (e.code === "ArrowRight") {
+    loadTrack(currentIndex + 1, true);
+  }
+
+  if (e.code === "ArrowLeft") {
+    loadTrack(currentIndex - 1, true);
+  }
 });
 
-DOM.video.src = BG.night;
+let resizeTimer;
+
+window.addEventListener("resize", () => {
+  clearTimeout(resizeTimer);
+
+  resizeTimer = setTimeout(() => {
+    setBackground();
+  }, 250);
+});
+
+const mediaQuery = window.matchMedia("(max-width: 767px)");
+
+mediaQuery.addEventListener("change", () => {
+  setBackground(true);
+});
+
+DOM.video.src = getBackground();
+
+DOM.video.load();
+
 DOM.video.play().catch(() => {});
 
+currentBackground = getBackground();
+
 loadTrack(0);
+
 renderTracks();
+
 updatePlayIcon();
 
 let journeyStartTime = Date.now();
@@ -402,7 +524,9 @@ function updateClockAndDistance() {
   const now = new Date();
 
   const hours = String(now.getHours()).padStart(2, "0");
+
   const minutes = String(now.getMinutes()).padStart(2, "0");
+
   const seconds = String(now.getSeconds()).padStart(2, "0");
 
   $("realClock").textContent = `${hours}:${minutes}:${seconds}`;
